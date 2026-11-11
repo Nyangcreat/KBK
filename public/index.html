@@ -207,7 +207,8 @@ table.lab{border-collapse:separate;border-spacing:0;font-size:13.5px;min-width:1
 .wg .tk.d0,.wg .cell.d0{border-left:2px solid var(--line)}
 .wg .cell{grid-row:3;border-left:1px dashed var(--line);border-top:1px solid var(--line);background:var(--bg)}
 .wg .cell.hot{background:var(--accent-soft)}
-.blk{grid-row:3;position:relative;z-index:2;align-self:center;height:56px;border-radius:7px;background:var(--c);color:#1c2826;font-size:11.5px;font-weight:700;padding:4px 12px 4px 4px;min-width:0;text-align:left;overflow:hidden;white-space:nowrap;line-height:1.25;border:0;margin:0 1px;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.blk{grid-row:3;position:relative;z-index:2;align-self:center;height:56px;border-radius:7px;background:var(--c);color:#1c2826;font-size:11.5px;font-weight:700;padding:4px 12px 4px 12px;min-width:0;text-align:left;overflow:hidden;white-space:nowrap;line-height:1.25;border:0;margin:0 1px;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.blk .hd.l{right:auto;left:0}
 .blk .hd{position:absolute;top:0;bottom:0;right:0;width:12px;touch-action:none;cursor:ew-resize;display:grid;place-items:center}
 .blk .hd::after{content:"";width:3px;height:18px;border-radius:2px;background:rgba(0,0,0,.35)}
 .blk .tm{display:block;font-size:10px;font-weight:500;opacity:.8}
@@ -792,7 +793,7 @@ function renderCare(){
   let h=days.map((s,i)=>{const d=parseYmd(s);return `<div class="dh ${i===0?"sun":i===6?"sat":""} ${s===today?"today":""}" style="grid-column:${i*6+1}/span 6">${d.getMonth()+1}/${d.getDate()}<small>${DOW[i]}</small></div>`}).join("");
   for(let g=0;g<42;g++){const k=g%6;h+=`<span class="tk ${k?"":"d0"}" style="grid-column:${g+1}"></span><div class="cell ${k?"":"d0"}" data-g="${g}" style="grid-column:${g+1}"></div>`}
   let g=0;while(g<42){const n=W[g];if(!n){g++;continue}let e=g;while(e+1<42&&W[e+1]===n)e++;const p=personOf(n);
-    h+=`<button class="blk" data-s="${g}" data-e="${e}" style="grid-column:${g+1}/${e+2};--c:${p?p.c:"#ddd"}">${esc(n)}${e-g>=5?`<span class="tm">${hm(cfg.times[g%6])}~${hm(cfg.times[(e+1)%6])}</span>`:""}<span class="hd" aria-label="시간 늘리기"></span></button>`;g=e+1}
+    h+=`<button class="blk" data-s="${g}" data-e="${e}" style="grid-column:${g+1}/${e+2};--c:${p?p.c:"#ddd"}">${esc(n)}${e-g>=5?`<span class="tm">${hm(cfg.times[g%6])}~${hm(cfg.times[(e+1)%6])}</span>`:""}<span class="hd l" aria-label="시작 시간 조절"></span><span class="hd" aria-label="끝 시간 조절"></span></button>`;g=e+1}
   $("#cGrid").innerHTML=h;
     const tot={};const first=new Date(L.y,L.m,1),last=new Date(L.y,L.m+1,0);
   for(let d=new Date(first);d<=last;d.setDate(d.getDate()+1)){slotsOf(ymd(d)).forEach((n,k)=>{if(n)tot[n]=(tot[n]||0)+hrs[k]})}
@@ -822,10 +823,12 @@ $("#cPal").addEventListener("click",e=>{if(e.target.closest("#palAdd"))openPeopl
 /* 오른쪽 손잡이로 옆으로 늘리기·줄이기 (다음 날로 넘어가도 돼요) */
 $("#cGrid").addEventListener("pointerdown",e=>{
   const hd=e.target.closest(".hd");if(!hd)return;e.preventDefault();e.stopPropagation();if(!guard())return;
-  const blk=hd.closest(".blk"),s=+blk.dataset.s,e0=+blk.dataset.e,base=weekSlots(),n=base[s];let end=e0;
+  const blk=hd.closest(".blk"),s0=+blk.dataset.s,e0=+blk.dataset.e,base=weekSlots(),n=base[s0],left=hd.classList.contains("l");let st=s0,end=e0;
   let lastX=e.clientX;
-  const apply=()=>{const cells=[...document.querySelectorAll("#cGrid .cell")];let k=s;for(const c of cells){const r=c.getBoundingClientRect();if(lastX>=r.left+r.width*.4)k=+c.dataset.g}k=Math.max(s,k);
-    if(k!==end){end=k;const W=base.slice();for(let i=s;i<=end;i++)W[i]=n;for(let i=end+1;i<=e0;i++)W[i]=null;putWeek(W,false)}};
+  const apply=()=>{const cells=[...document.querySelectorAll("#cGrid .cell")];let k=left?41:0;
+    for(const c of cells){const r=c.getBoundingClientRect(),g=+c.dataset.g;if(left){if(lastX<r.right-r.width*.4){k=g;break}}else if(lastX>=r.left+r.width*.4)k=g}
+    k=left?Math.min(k,e0):Math.max(s0,k);
+    const ns=left?k:s0,ne=left?e0:k;if(ns!==st||ne!==end){st=ns;end=ne;const W=base.slice();for(let i=s0;i<=e0;i++)W[i]=null;for(let i=st;i<=end;i++)W[i]=n;putWeek(W,false)}};
   const mv=ev=>{lastX=ev.clientX;apply()};
   const up=()=>{document.removeEventListener("pointermove",mv);document.removeEventListener("pointerup",up);document.removeEventListener("pointercancel",up);putWeek(weekSlots(),true)};
   document.addEventListener("pointermove",mv);document.addEventListener("pointerup",up);document.addEventListener("pointercancel",up);
