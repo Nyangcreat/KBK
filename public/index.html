@@ -189,7 +189,7 @@ table.lab{border-collapse:separate;border-spacing:0;font-size:13.5px;min-width:1
 .chk{display:flex;gap:8px;align-items:center;font-size:14px}
 .chk input{width:18px;height:18px}
 .confirm{font-size:13.5px;color:var(--high)}
-/* 간병 — 한 주씩, 사람을 끌어다 놓고 아래 손잡이로 시간 늘리기 */
+/* 간병 — 한 주를 가로로: 요일마다 6칸, 이름을 끌어다 놓고 오른쪽 손잡이로 시간 늘리기 */
 .cv-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .wk{display:flex;align-items:center;gap:4px;flex:none}
 .wk b{font-family:var(--font-display);font-size:20px;white-space:nowrap;min-width:5.6em;text-align:center}
@@ -198,17 +198,19 @@ table.lab{border-collapse:separate;border-spacing:0;font-size:13.5px;min-width:1
 .pc{flex:none;border:0;background:var(--c);color:#1c2826;border-radius:999px;padding:7px 12px;font-size:14px;font-weight:600;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;box-shadow:0 1px 3px rgba(0,0,0,.15)}
 .pc.add{background:var(--surface);border:1.5px dashed var(--accent);color:var(--accent);box-shadow:none;cursor:pointer;touch-action:auto}
 .drag-ghost{position:fixed;z-index:60;pointer-events:none;transform:translate(-50%,-120%);opacity:.92}
-.wg{display:grid;grid-template-columns:34px repeat(7,minmax(0,1fr));grid-template-rows:auto repeat(6,58px);gap:2px;position:relative}
-.wg .dh{grid-row:1;text-align:center;font-size:12px;font-weight:600;padding:2px 0 4px;border:0;background:none;color:var(--ink);border-radius:6px}
-.wg .dh small{display:block;font-size:10.5px;color:var(--muted);font-weight:500}
+.wscroll{border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden}
+.wg{display:grid;grid-template-columns:repeat(42,minmax(0,1fr));grid-template-rows:auto 8px 72px;position:relative}
+.wg .dh{grid-row:1;grid-column:span 6;text-align:center;font-size:12px;font-weight:600;padding:5px 0 3px;border-left:2px solid var(--line);color:var(--ink);line-height:1.2;min-width:0}
+.wg .dh small{display:block;font-size:10px;color:var(--muted);font-weight:500}
 .wg .dh.sun{color:var(--high)} .wg .dh.sat{color:var(--low)} .wg .dh.today{background:var(--accent-soft)}
-.wg .tlb{grid-column:1;font-size:10px;color:var(--muted);text-align:right;padding-right:3px;align-self:start;font-variant-numeric:tabular-nums;line-height:1}
-.wg .cell{border:1px solid var(--line);border-radius:4px;background:var(--bg)}
-.wg .cell.hot{background:var(--accent-soft);border-color:var(--accent)}
-.blk{position:relative;z-index:2;border-radius:6px;background:var(--c);color:#1c2826;font-size:11.5px;font-weight:700;padding:4px 2px 12px;text-align:center;overflow:hidden;word-break:keep-all;line-height:1.2;border:0;margin:1px;box-shadow:0 1px 3px rgba(0,0,0,.18)}
-.blk .hd{position:absolute;left:0;right:0;bottom:0;height:12px;touch-action:none;cursor:ns-resize;display:grid;place-items:center}
-.blk .hd::after{content:"";width:16px;height:3px;border-radius:2px;background:rgba(0,0,0,.35)}
-.blk .tm{display:block;font-size:9.5px;font-weight:500;opacity:.8;margin-top:2px}
+.wg .tk{grid-row:2;border-left:1px solid var(--muted);opacity:.5}
+.wg .tk.d0,.wg .cell.d0{border-left:2px solid var(--line)}
+.wg .cell{grid-row:3;border-left:1px dashed var(--line);border-top:1px solid var(--line);background:var(--bg)}
+.wg .cell.hot{background:var(--accent-soft)}
+.blk{grid-row:3;position:relative;z-index:2;align-self:center;height:56px;border-radius:7px;background:var(--c);color:#1c2826;font-size:11.5px;font-weight:700;padding:4px 12px 4px 4px;min-width:0;text-align:left;overflow:hidden;white-space:nowrap;line-height:1.25;border:0;margin:0 1px;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.blk .hd{position:absolute;top:0;bottom:0;right:0;width:12px;touch-action:none;cursor:ew-resize;display:grid;place-items:center}
+.blk .hd::after{content:"";width:3px;height:18px;border-radius:2px;background:rgba(0,0,0,.35)}
+.blk .tm{display:block;font-size:10px;font-weight:500;opacity:.8}
 .hours{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13px}
 .hours span{display:inline-flex;align-items:center;gap:5px}
 .hours i{width:10px;height:10px;border-radius:50%;background:var(--c)}
@@ -286,7 +288,7 @@ table.lab{border-collapse:separate;border-spacing:0;font-size:13.5px;min-width:1
         <div class="ppl" id="cPal"></div>
       </div>
       <p class="small muted" id="palHint" style="margin:0 2px"></p>
-      <div class="wg" id="cGrid"></div>
+      <div class="wscroll" id="cScroll"><div class="wg" id="cGrid"></div></div>
     </div>
     <div class="card"><div class="sec-h" style="margin-bottom:6px"><h2 id="cMonthH">이번 달 간병 시간</h2><button class="btn" id="cTimes" style="padding:4px 10px;font-size:12.5px;white-space:nowrap">시간 조정</button></div><div class="hours" id="cHours"></div></div>
   </section>
@@ -773,65 +775,68 @@ function fillNames(){document.querySelectorAll("[data-uid]").forEach(e=>{const n
 const CARE_COLORS=["#F6C9A8","#BFD8F2","#CDE7C4","#E8C8EC","#F7E3A1","#F4B9C3","#C9E6E4","#D9D2F3"];
 const DEF_TIMES=["00:00","04:00","08:00","12:00","16:00","20:00"];
 const sunday=d=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-x.getDay());return x};
-let cWeek=sunday(new Date());
+let cWeek=sunday(new Date()),cScrolled=null;
 const careCfg=()=>{const c=S.care._cfg||{};return {people:Array.isArray(c.people)?c.people:[],times:Array.isArray(c.times)&&c.times.length===6?c.times:DEF_TIMES}};
 const personOf=n=>careCfg().people.find(p=>p.n===n);
 const slotHours=times=>times.map((t,i)=>{const a=+t.slice(0,2)*60+ +t.slice(3,5),nx=times[(i+1)%6],b=+nx.slice(0,2)*60+ +nx.slice(3,5);return ((b-a+1440)%1440||1440)/60});
 const hm=t=>{const h=+t.slice(0,2),m=t.slice(3,5);return m==="00"?h+"시":h+":"+m};
 const slotsOf=d=>{const a=(S.care[d]?.slots||[]).slice(0,6);while(a.length<6)a.push(null);return a};
-function weekLabel(ws){const mid=new Date(ws);mid.setDate(ws.getDate()+3);const m=mid.getMonth();const f=new Date(mid.getFullYear(),m,1);const firstMid=sunday(f);firstMid.setDate(firstMid.getDate()+3);if(firstMid.getMonth()!==m)firstMid.setDate(firstMid.getDate()+7);return {m,y:mid.getFullYear(),wk:Math.round((mid-firstMid)/(7*864e5))+1}}
+const weekDays=()=>[...Array(7)].map((_,i)=>{const d=new Date(cWeek);d.setDate(cWeek.getDate()+i);return ymd(d)});
+const weekSlots=()=>weekDays().flatMap(slotsOf);
+function weekLabel(ws){const mid=new Date(ws);mid.setDate(ws.getDate()+3);const m=mid.getMonth();const firstMid=sunday(new Date(mid.getFullYear(),m,1));firstMid.setDate(firstMid.getDate()+3);if(firstMid.getMonth()!==m)firstMid.setDate(firstMid.getDate()+7);return {m,y:mid.getFullYear(),wk:Math.round((mid-firstMid)/(7*864e5))+1}}
 function renderCare(){
-  const cfg=careCfg(),hrs=slotHours(cfg.times),L=weekLabel(cWeek);
+  const cfg=careCfg(),hrs=slotHours(cfg.times),L=weekLabel(cWeek),days=weekDays(),W=weekSlots(),today=ymd(new Date());
   $("#cLabel").textContent=`${L.m+1}월 ${L.wk}wk`;
   $("#cPal").innerHTML=cfg.people.map(p=>`<button class="pc" style="--c:${p.c}" data-n="${esc(p.n)}">${esc(p.n)}</button>`).join("")+`<button class="pc add" id="palAdd" aria-label="간병할 사람 추가">＋</button>`;
-  $("#palHint").textContent=cfg.people.length?"이름을 끌어다 칸에 놓고, 블록 아래 손잡이를 끌어 시간을 늘리세요. 블록을 누르면 지울 수 있어요.":"오른쪽 위 ＋를 눌러 간병할 사람을 먼저 추가하세요.";
-  const today=ymd(new Date());const days=[...Array(7)].map((_,i)=>{const d=new Date(cWeek);d.setDate(cWeek.getDate()+i);return d});
-  let h=`<span></span>`+days.map((d,i)=>`<div class="dh ${i===0?"sun":i===6?"sat":""} ${ymd(d)===today?"today":""}" style="grid-column:${i+2}">${d.getDate()}<small>${DOW[i]}</small></div>`).join("");
-  for(let k=0;k<6;k++){h+=`<span class="tlb" style="grid-row:${k+2}">${cfg.times[k]}</span>`;days.forEach((d,i)=>{h+=`<div class="cell" data-d="${ymd(d)}" data-k="${k}" style="grid-column:${i+2};grid-row:${k+2}"></div>`})}
-  days.forEach((d,i)=>{const s=ymd(d),a=slotsOf(s);let k=0;while(k<6){const n=a[k];if(!n){k++;continue}let e=k;while(e+1<6&&a[e+1]===n)e++;const p=personOf(n);const endT=cfg.times[(e+1)%6];
-    h+=`<button class="blk" data-d="${s}" data-s="${k}" data-e="${e}" style="grid-column:${i+2};grid-row:${k+2}/${e+3};--c:${p?p.c:"#ddd"}">${esc(n)}<span class="tm">${hm(cfg.times[k])}~${hm(endT)}</span><span class="hd" aria-label="시간 늘리기"></span></button>`;k=e+1}});
+  $("#palHint").textContent=cfg.people.length?`하루 6칸(${cfg.times.map(t=>+t.slice(0,2)).join("·")}시). 이름을 끌어다 놓고 막대 오른쪽 끝을 옆으로 끌어 늘려요. 막대를 누르면 시간 확인·지우기.`:"오른쪽 위 ＋를 눌러 간병할 사람을 먼저 추가하세요.";
+  let h=days.map((s,i)=>{const d=parseYmd(s);return `<div class="dh ${i===0?"sun":i===6?"sat":""} ${s===today?"today":""}" style="grid-column:${i*6+1}/span 6">${d.getMonth()+1}/${d.getDate()}<small>${DOW[i]}</small></div>`}).join("");
+  for(let g=0;g<42;g++){const k=g%6;h+=`<span class="tk ${k?"":"d0"}" style="grid-column:${g+1}"></span><div class="cell ${k?"":"d0"}" data-g="${g}" style="grid-column:${g+1}"></div>`}
+  let g=0;while(g<42){const n=W[g];if(!n){g++;continue}let e=g;while(e+1<42&&W[e+1]===n)e++;const p=personOf(n);
+    h+=`<button class="blk" data-s="${g}" data-e="${e}" style="grid-column:${g+1}/${e+2};--c:${p?p.c:"#ddd"}">${esc(n)}${e-g>=5?`<span class="tm">${hm(cfg.times[g%6])}~${hm(cfg.times[(e+1)%6])}</span>`:""}<span class="hd" aria-label="시간 늘리기"></span></button>`;g=e+1}
   $("#cGrid").innerHTML=h;
-  // 이번 달 합계 (라벨 달 기준)
-  const tot={};const first=new Date(L.y,L.m,1),last=new Date(L.y,L.m+1,0);
+    const tot={};const first=new Date(L.y,L.m,1),last=new Date(L.y,L.m+1,0);
   for(let d=new Date(first);d<=last;d.setDate(d.getDate()+1)){slotsOf(ymd(d)).forEach((n,k)=>{if(n)tot[n]=(tot[n]||0)+hrs[k]})}
   $("#cMonthH").textContent=`${L.m+1}월 간병 시간`;
   $("#cHours").innerHTML=Object.keys(tot).length?Object.entries(tot).sort((a,b)=>b[1]-a[1]).map(([n,v])=>`<span><i style="--c:${personOf(n)?.c||"#ddd"}"></i>${esc(n)} <b>${Math.round(v*10)/10}시간</b></span>`).join(""):`<span class="muted">이 달에 배치된 간병이 아직 없어요.</span>`;
 }
 const careSaveT={},careLocal={}; // 아직 서버에 안 간 칸은 화면에 계속 보이게
-function setSlots(d,fn){
-  if(!guard())return;
-  const cur=slotsOf(d);fn(cur);const doc={date:d,slots:cur};careLocal[d]=doc;S.care[d]=doc;renderCare();
-  clearTimeout(careSaveT[d]);careSaveT[d]=setTimeout(async()=>{const mine=careLocal[d];if(await save("care",d,mine)&&careLocal[d]===mine)delete careLocal[d]},500);
+function putWeek(W,saveIt){ // W: 42 slots for the shown week
+  const days=weekDays();days.forEach((d,i)=>{const cur=slotsOf(d),nx=W.slice(i*6,i*6+6);if(cur.every((v,k)=>v===nx[k])&&!careLocal[d])return;
+    const doc={date:d,slots:nx};careLocal[d]=doc;S.care[d]=doc;
+    if(saveIt){clearTimeout(careSaveT[d]);careSaveT[d]=setTimeout(async()=>{const mine=careLocal[d];if(await save("care",d,mine)&&careLocal[d]===mine)delete careLocal[d]},400)}});
+  renderCare();
 }
 const cellAt=(x,y)=>document.elementsFromPoint(x,y).find(el=>el.matches&&el.matches("#cGrid .cell"))||null;
 /* 이름표 끌어다 놓기 */
 $("#cPal").addEventListener("pointerdown",e=>{
-  const b=e.target.closest(".pc:not(.add)");if(!b)return;e.preventDefault();
-  const n=b.dataset.n,g=b.cloneNode(true);g.classList.add("drag-ghost");document.body.appendChild(g);
-  let hot=null;const mv=ev=>{g.style.left=ev.clientX+"px";g.style.top=ev.clientY+"px";const cc=cellAt(ev.clientX,ev.clientY);if(hot!==cc){hot&&hot.classList.remove("hot");hot=cc;hot&&hot.classList.add("hot")}};
+  const b=e.target.closest(".pc:not(.add)");if(!b)return;e.preventDefault();if(!guard())return;
+  const n=b.dataset.n,gh=b.cloneNode(true);gh.classList.add("drag-ghost");document.body.appendChild(gh);
+  let hot=null;const mv=ev=>{gh.style.left=ev.clientX+"px";gh.style.top=ev.clientY+"px";const cc=cellAt(ev.clientX,ev.clientY);if(hot!==cc){hot&&hot.classList.remove("hot");hot=cc;hot&&hot.classList.add("hot")}};
   mv(e);
-  const up=ev=>{document.removeEventListener("pointermove",mv);document.removeEventListener("pointerup",up);document.removeEventListener("pointercancel",up);g.remove();hot&&hot.classList.remove("hot");
-    if(ev.type==="pointerup"&&hot){const d=hot.dataset.d,k=+hot.dataset.k;setSlots(d,a=>{a[k]=n})}
+  const up=ev=>{document.removeEventListener("pointermove",mv);document.removeEventListener("pointerup",up);document.removeEventListener("pointercancel",up);gh.remove();hot&&hot.classList.remove("hot");
+    if(ev.type==="pointerup"&&hot){const W=weekSlots();W[+hot.dataset.g]=n;putWeek(W,true)}
     else if(ev.type==="pointerup")toast("시간표 칸 위에 놓아 주세요.")};
   document.addEventListener("pointermove",mv);document.addEventListener("pointerup",up);document.addEventListener("pointercancel",up);
 });
 $("#cPal").addEventListener("click",e=>{if(e.target.closest("#palAdd"))openPeople()});
-/* 블록 손잡이로 시간 늘리기·줄이기, 블록 누르면 지우기 */
+/* 오른쪽 손잡이로 옆으로 늘리기·줄이기 (다음 날로 넘어가도 돼요) */
 $("#cGrid").addEventListener("pointerdown",e=>{
-  const hd=e.target.closest(".hd");if(!hd)return;e.preventDefault();e.stopPropagation();
-  const blk=hd.closest(".blk"),d=blk.dataset.d,s=+blk.dataset.s,e0=+blk.dataset.e,n=slotsOf(d)[s];
-  const base=slotsOf(d);let end=e0;
-  const mv=ev=>{const cells=[...document.querySelectorAll(`#cGrid .cell[data-d="${d}"]`)];let k=s;for(const c of cells){const r=c.getBoundingClientRect();if(ev.clientY>=r.top+r.height*.35)k=+c.dataset.k}k=Math.max(s,k);if(k!==end){end=k;const a=base.slice();for(let i=s;i<=end;i++)a[i]=n;for(let i=end+1;i<=e0;i++)a[i]=null;S.care[d]={date:d,slots:a};careLocal[d]=S.care[d];renderCare()}};
-  const up=()=>{document.removeEventListener("pointermove",mv);document.removeEventListener("pointerup",up);document.removeEventListener("pointercancel",up);setSlots(d,a=>a)};
+  const hd=e.target.closest(".hd");if(!hd)return;e.preventDefault();e.stopPropagation();if(!guard())return;
+  const blk=hd.closest(".blk"),s=+blk.dataset.s,e0=+blk.dataset.e,base=weekSlots(),n=base[s];let end=e0;
+  let lastX=e.clientX;
+  const apply=()=>{const cells=[...document.querySelectorAll("#cGrid .cell")];let k=s;for(const c of cells){const r=c.getBoundingClientRect();if(lastX>=r.left+r.width*.4)k=+c.dataset.g}k=Math.max(s,k);
+    if(k!==end){end=k;const W=base.slice();for(let i=s;i<=end;i++)W[i]=n;for(let i=end+1;i<=e0;i++)W[i]=null;putWeek(W,false)}};
+  const mv=ev=>{lastX=ev.clientX;apply()};
+  const up=()=>{document.removeEventListener("pointermove",mv);document.removeEventListener("pointerup",up);document.removeEventListener("pointercancel",up);putWeek(weekSlots(),true)};
   document.addEventListener("pointermove",mv);document.addEventListener("pointerup",up);document.addEventListener("pointercancel",up);
 });
 $("#cGrid").addEventListener("click",e=>{
   const blk=e.target.closest(".blk");if(!blk||e.target.closest(".hd"))return;
-  const d=blk.dataset.d,s=+blk.dataset.s,en=+blk.dataset.e,cfg=careCfg(),n=slotsOf(d)[s],root=$("#sheetRoot");
-  root.innerHTML=`<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-label="간병 블록"><h2>${esc(n)}</h2><p style="margin:0">${fmtDay(d)} ${cfg.times[s]} ~ ${cfg.times[(en+1)%6]}</p>
-    <div class="acts"><button class="btn danger" id="bDel">이 블록 지우기</button><span class="spacer"></span><button class="btn" id="bClose">닫기</button></div></div></div>`;
+  const s=+blk.dataset.s,en=+blk.dataset.e,cfg=careCfg(),days=weekDays(),n=weekSlots()[s],root=$("#sheetRoot");
+  root.innerHTML=`<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-label="간병"><h2>${esc(n)}</h2><p style="margin:0">${fmtDay(days[Math.floor(s/6)])} ${cfg.times[s%6]} ~ ${fmtDay(days[Math.floor((en+1)/6)]||days[6])} ${cfg.times[(en+1)%6]}</p>
+    <div class="acts"><button class="btn danger" id="bDel">지우기</button><span class="spacer"></span><button class="btn" id="bClose">닫기</button></div></div></div>`;
   const close=()=>root.innerHTML="";$("#scrim").addEventListener("click",ev=>{if(ev.target.id==="scrim")close()});$("#bClose").onclick=close;
-  $("#bDel").onclick=()=>{setSlots(d,a=>{for(let i=s;i<=en;i++)a[i]=null});close()};
+  $("#bDel").onclick=()=>{if(!guard())return;const W=weekSlots();for(let i=s;i<=en;i++)W[i]=null;putWeek(W,true);close()};
 });
 $("#cPrev").onclick=()=>{cWeek.setDate(cWeek.getDate()-7);renderCare()};
 $("#cNext").onclick=()=>{cWeek.setDate(cWeek.getDate()+7);renderCare()};
@@ -840,13 +845,12 @@ function openPeople(){
   if(!guard())return;const root=$("#sheetRoot");
   const draw=()=>{const cfg=careCfg();root.innerHTML=`<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-label="간병하는 사람">
     <h2>간병하는 사람</h2>
-    <div style="display:flex;gap:8px"><input class="inp" id="pNew" placeholder="이름 (예: 큰딸, 아빠, 간병인 이모)" maxlength="10"><button class="btn primary" id="pAdd">추가</button></div>
+    <div style="display:flex;gap:8px"><input class="inp" id="pNew" placeholder="이름" maxlength="10"><button class="btn primary" id="pAdd">추가</button></div>
     <div style="display:flex;flex-direction:column;gap:6px">${cfg.people.map((p,i)=>`<div style="display:flex;align-items:center;gap:8px"><input type="color" value="${p.c}" data-i="${i}" class="pcol" aria-label="${esc(p.n)} 색" style="width:36px;height:32px;border:0;background:none;padding:0"><span style="flex:1;font-weight:600">${esc(p.n)}</span><button class="btn danger" data-del="${i}" style="padding:4px 10px">빼기</button></div>`).join("")}</div>
-    <p class="small muted" style="margin:0">빼도 이미 배치된 시간표는 그대로 남아요.</p>
     <div class="acts"><span class="spacer"></span><button class="btn" id="pClose">닫기</button></div></div></div>`;
     $("#scrim").addEventListener("click",e=>{if(e.target.id==="scrim")root.innerHTML=""});
     $("#pClose").onclick=()=>root.innerHTML="";
-    const add=()=>{const n=$("#pNew").value.trim();if(!n)return;const c=careCfg();if(c.people.some(p=>p.n===n)){toast("이미 있는 이름이에요.");return}saveCfg({people:[...c.people,{n,c:CARE_COLORS[c.people.length%CARE_COLORS.length]}]});draw();$("#pNew").focus()};
+    const add=()=>{const n=$("#pNew").value.trim();if(!n)return;const c=careCfg();if(c.people.some(p=>p.n===n)){toast("이미 있는 이름이에요.");return}saveCfg({people:[...c.people,{n,c:CARE_COLORS[c.people.length%CARE_COLORS.length]}]});root.innerHTML=""};
     $("#pAdd").onclick=add;$("#pNew").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();add()}};
     root.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{const c=careCfg();saveCfg({people:c.people.filter((_,i)=>i!==+b.dataset.del)});draw()});
     root.querySelectorAll(".pcol").forEach(inp=>inp.onchange=()=>{const c=careCfg();saveCfg({people:c.people.map((p,i)=>i===+inp.dataset.i?{...p,c:inp.value}:p)})});
