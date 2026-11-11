@@ -1,0 +1,828 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>엄마 항암 수첩</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: 휴대폰 한 손 사용 기준. 상단 고정 탭 3개(기록·피검사·실비), 그 아래 한 열로 쌓이는 카드. 캘린더 → 날짜 상세 순. */
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --ink:#1c2826; --muted:#5d6c69; --line:#dce3e1;
+  --accent:#2e6b64; --accent-ink:#ffffff; --accent-soft:#e0eeeb;
+  --high:#c0392b; --high-soft:#fbe7e4; --low:#2b5fb0; --low-soft:#e4ecf9; --warn:#a96a12; --warn-soft:#fbf0dc;
+  --t-chemo:#7b4790; --t-chemo-s:#f1e6f5; --t-out:#2d61a5; --t-out-s:#e3ecf8; --t-in:#b2561d; --t-in-s:#f9e8db;
+  --t-test:#2b7a6e; --t-test-s:#ddf0ea; --t-rest:#4c7a30; --t-rest-s:#e7f1dc; --t-etc:#666e6c; --t-etc-s:#eceeed;
+  --font-display:"Gowun Batang", "Nanum Myeongjo", serif;
+  --font-body:"IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#111615; --surface:#19201f; --ink:#e3eae8; --muted:#92a29f; --line:#2b3533;
+  --accent:#72b9ae; --accent-ink:#0d1a18; --accent-soft:#1d3330;
+  --high:#f08a7e; --high-soft:#3a1f1c; --low:#8db3f0; --low-soft:#1c2840; --warn:#e3b05c; --warn-soft:#352a17;
+  --t-chemo:#c9a0dc; --t-chemo-s:#30233a; --t-out:#94b8ec; --t-out-s:#1e2b40; --t-in:#eba27a; --t-in-s:#3b2618;
+  --t-test:#7fcbbd; --t-test-s:#18332e; --t-rest:#a7cf8d; --t-rest-s:#233219; --t-etc:#b3bcba; --t-etc-s:#272d2c;
+  color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#111615; --surface:#19201f; --ink:#e3eae8; --muted:#92a29f; --line:#2b3533;
+  --accent:#72b9ae; --accent-ink:#0d1a18; --accent-soft:#1d3330;
+  --high:#f08a7e; --high-soft:#3a1f1c; --low:#8db3f0; --low-soft:#1c2840; --warn:#e3b05c; --warn-soft:#352a17;
+  --t-chemo:#c9a0dc; --t-chemo-s:#30233a; --t-out:#94b8ec; --t-out-s:#1e2b40; --t-in:#eba27a; --t-in-s:#3b2618;
+  --t-test:#7fcbbd; --t-test-s:#18332e; --t-rest:#a7cf8d; --t-rest-s:#233219; --t-etc:#b3bcba; --t-etc-s:#272d2c;
+  color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.5;font-variant-numeric:tabular-nums}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;flex-direction:column;gap:8px;padding-block:12px 0}
+.brand{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+h1{font-family:var(--font-display);font-size:22px;margin:0;letter-spacing:-.01em}
+.sync{font-size:12px;color:var(--muted)}
+.tabs{display:flex;gap:4px}
+.tab{flex:1;border:0;background:none;padding:10px 4px 12px;font-weight:500;color:var(--muted);border-bottom:3px solid transparent}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+main .wrap{padding-block:16px 48px;display:flex;flex-direction:column;gap:16px}
+
+.notice{padding:10px 12px;border-radius:var(--r);background:var(--warn-soft);color:var(--ink);font-size:13.5px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.sec-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+h2{font-size:16px;margin:0;font-weight:600}
+h3{font-size:13px;margin:0;color:var(--muted);font-weight:500;letter-spacing:.02em}
+.muted{color:var(--muted)} .small{font-size:12.5px}
+
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-size:14px;font-weight:500}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.danger{color:var(--high);border-color:var(--high)}
+.btn:disabled{opacity:.5;cursor:default}
+.iconbtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;width:36px;height:36px;font-size:18px;line-height:1}
+
+/* calendar */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.cal-nav .m{font-family:var(--font-display);font-size:19px}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
+.dow{font-size:11.5px;text-align:center;color:var(--muted);padding-bottom:2px}
+.dow.sun{color:var(--high)} .dow.sat{color:var(--low)}
+.day{min-height:62px;border:1px solid transparent;border-radius:8px;background:var(--bg);padding:4px 3px 3px;text-align:left;display:flex;flex-direction:column;gap:2px;min-width:0;overflow:hidden}
+.day.out{opacity:.35}
+.day.today .dn{background:var(--ink);color:var(--surface);border-radius:999px;padding:0 5px}
+.day.sel{border-color:var(--accent);background:var(--accent-soft)}
+.dn{font-size:12px;font-weight:600;align-self:flex-start}
+.chip-t{font-size:10px;line-height:1.3;border-radius:4px;padding:1px 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.dots{display:flex;gap:3px;margin-top:auto;flex-wrap:wrap}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--muted)}
+.dot.fever{background:var(--high)} .dot.warm{background:var(--warn)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:10px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+
+.t-항암{background:var(--t-chemo-s);color:var(--t-chemo)}
+.t-외래{background:var(--t-out-s);color:var(--t-out)}
+.t-입원{background:var(--t-in-s);color:var(--t-in)}
+.t-검사{background:var(--t-test-s);color:var(--t-test)}
+.t-요양{background:var(--t-rest-s);color:var(--t-rest)}
+.t-타병원,.t-기타,.t-검사\/외래{background:var(--t-etc-s);color:var(--t-etc)}
+.pill{display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:2px 9px;white-space:nowrap}
+
+/* day panel */
+.day-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.day-h .d{font-family:var(--font-display);font-size:21px}
+.sched{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.sched-item{display:flex;gap:10px;align-items:flex-start;border:0;background:var(--bg);border-radius:10px;padding:10px;text-align:left;width:100%}
+.sched-item .body{min-width:0;flex:1}
+.sched-item .hosp{font-weight:600}
+.basics{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:10px;margin-top:14px}
+@media (max-width:420px){.basics{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label,.flabel{font-size:12.5px;color:var(--muted)}
+.inp{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 10px;min-width:0}
+textarea.inp{resize:vertical;min-height:60px}
+.with-unit{display:flex;align-items:center;gap:6px}
+.with-unit .inp{flex:1}
+.cond{display:flex;gap:4px}
+.cond button{flex:1;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 0;font-size:12.5px;min-width:0}
+.cond button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.quick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:14px}
+.quick button{border:1px dashed var(--line);background:var(--bg);border-radius:10px;padding:9px 4px;font-size:13.5px;font-weight:500}
+.quick button b{color:var(--accent);font-weight:600}
+.counts{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-top:12px}
+.tl{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column}
+.tl li{border-top:1px solid var(--line)}
+.tl button{display:grid;grid-template-columns:48px 64px minmax(0,1fr);gap:8px;align-items:baseline;width:100%;border:0;background:none;text-align:left;padding:10px 2px}
+.tl .tm{font-size:13px;color:var(--muted)}
+.tl .k{font-size:12px;font-weight:600;color:var(--accent)}
+.tl .v{min-width:0;overflow-wrap:anywhere}
+.tl .by{font-size:11.5px;color:var(--muted)}
+.flag-high{color:var(--high);font-weight:600} .flag-warn{color:var(--warn);font-weight:600}
+.empty{padding:14px 0 4px;color:var(--muted);font-size:13.5px}
+
+/* labs */
+.upload{display:flex;flex-direction:column;gap:10px}
+.drop{border:1.5px dashed var(--accent);border-radius:var(--r);background:var(--accent-soft);padding:18px 14px;text-align:center;display:block;cursor:pointer}
+.drop strong{display:block;font-size:15px}
+.drop input{position:absolute;opacity:0;width:1px;height:1px}
+.thumbs{display:flex;gap:6px;flex-wrap:wrap}
+.thumbs img{width:64px;height:96px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+.status{font-size:13.5px;color:var(--muted)}
+.review-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 10px}
+@media (max-width:420px){.review-grid{grid-template-columns:1fr 1fr}}
+.rv .flabel b{color:var(--ink);font-weight:600}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table.lab{border-collapse:separate;border-spacing:0;font-size:13.5px;min-width:100%}
+.lab th,.lab td{padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:right}
+.lab thead th{position:sticky;top:0;background:var(--surface);font-weight:600;font-size:12.5px;vertical-align:bottom}
+.lab thead th button{border:0;background:none;padding:0;text-align:right;font-weight:600;color:var(--ink)}
+.lab thead th .h{display:block;font-weight:400;color:var(--muted);font-size:11px;max-width:84px;overflow:hidden;text-overflow:ellipsis}
+.lab .name{position:sticky;left:0;background:var(--surface);text-align:left;z-index:1;border-right:1px solid var(--line)}
+.lab .name button{border:0;background:none;padding:0;text-align:left;font-weight:600}
+.lab .name .rg{display:block;font-size:11px;color:var(--muted);font-weight:400}
+.lab tr.grp td{background:var(--bg);font-size:11.5px;color:var(--muted);text-align:left;padding:4px 10px;font-weight:500}
+.lab tr.grp td.name{background:var(--bg)}
+.lab td.hi{color:var(--high);background:var(--high-soft);font-weight:600}
+.lab td.lo{color:var(--low);background:var(--low-soft);font-weight:600}
+.lab tr.on .name button{color:var(--accent)}
+.chart svg{width:100%;height:auto;display:block}
+.cap-g{border-top:1px solid var(--line);padding-top:10px;margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.cap-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cap-h .inp{width:auto;font-weight:600}
+.cap-row{display:grid;grid-template-columns:22px minmax(0,1fr) 112px;gap:4px 8px;align-items:center;padding:4px 0}
+.cap-row input[type=checkbox]{width:18px;height:18px}
+.cap-row.off .cap-n,.cap-row.off .cap-v{opacity:.45}
+.cap-n{min-width:0;overflow-wrap:anywhere;font-size:14px}
+.cap-v{text-align:right}
+.cap-alt{grid-column:2/-1}
+.chart text{fill:var(--muted);font-size:11px;font-family:var(--font-body)}
+
+/* claims */
+.sum{display:flex;gap:10px;flex-wrap:wrap}
+.sum div{flex:1;min-width:120px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}
+.sum b{display:block;font-size:22px;font-weight:600}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filters button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:13px}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.claims{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.claim{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}
+.claim .info{border:0;background:none;padding:0;text-align:left;min-width:0;display:flex;flex-direction:column;gap:3px}
+.claim .info .row1{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.claim .info .hosp{font-weight:600}
+.claim .note{font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.toggles{display:flex;gap:6px}
+.tg{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:6px 8px;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:52px}
+.tg .ic{font-size:16px;line-height:1;color:var(--muted)}
+.tg[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+.tg[aria-pressed="true"] .ic{color:var(--accent)}
+.claim.done{opacity:.6}
+
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(10,16,15,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:560px;max-height:88%;overflow:auto;border-radius:16px 16px 0 0;padding:16px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:12px}
+@media (min-width:600px){.scrim{align-items:center}.sheet{border-radius:16px}}
+.sheet h2{font-size:17px}
+.sheet .fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.sheet .fields .full{grid-column:1/-1}
+.sheet .acts{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.sheet .acts .spacer{flex:1}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px}
+.chk input{width:18px;height:18px}
+.confirm{font-size:13.5px;color:var(--high)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--surface);padding:9px 16px;border-radius:999px;font-size:13.5px;z-index:30;max-width:90%}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:up .18s ease-out}@keyframes up{from{transform:translateY(16px);opacity:.6}}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><h1>엄마 항암 수첩</h1><span style="display:flex;align-items:center;gap:8px"><span class="sync" id="sync">불러오는 중…</span><button class="iconbtn" id="setBtn" aria-label="설정" style="width:32px;height:32px;font-size:16px">⚙</button></span></div>
+    <nav class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-cal" data-v="cal" aria-selected="true">기록·일정</button>
+      <button class="tab" role="tab" id="tab-lab" data-v="lab" aria-selected="false">피검사</button>
+      <button class="tab" role="tab" id="tab-claim" data-v="claim" aria-selected="false">실비 서류</button>
+    </nav>
+  </div>
+</header>
+
+<main><div class="wrap">
+  <div class="notice" id="notice" hidden></div>
+
+  <!-- 기록·일정 -->
+  <section id="v-cal" style="display:flex;flex-direction:column;gap:16px">
+    <div class="card">
+      <div class="cal-nav">
+        <button class="iconbtn" id="prevM" aria-label="이전 달">‹</button>
+        <span class="m" id="mLabel"></span>
+        <button class="iconbtn" id="nextM" aria-label="다음 달">›</button>
+      </div>
+      <div class="cal" id="cal"></div>
+      <div class="legend">
+        <span><i class="pill t-항암">항암</i></span><span><i class="pill t-외래">외래</i></span><span><i class="pill t-입원">입원</i></span><span><i class="pill t-검사">검사</i></span><span><i class="pill t-요양">요양</i></span>
+        <span><i class="dot fever"></i>38℃ 이상</span><span><i class="dot"></i>기록 있음</span>
+      </div>
+    </div>
+    <div class="card" id="dayPanel"></div>
+  </section>
+
+  <!-- 피검사 -->
+  <section id="v-lab" hidden style="flex-direction:column;gap:16px">
+    <div class="card upload" id="upCard">
+      <div class="sec-h"><h2>결과 캡처 올리기</h2><button class="btn" id="manualLab">직접 입력</button></div>
+      <label class="drop" id="dropLbl" for="labFile"><strong>병원 앱 캡처 선택</strong><span class="small muted">여러 장 한 번에 가능 · 수치를 읽어서 아래 표에 채워요</span><input type="file" id="labFile" accept="image/*" multiple></label>
+      <p class="small muted" id="noAi" hidden>이 화면에서는 캡처 자동 인식을 쓸 수 없어요. ‘직접 입력’으로 수치를 넣어 주세요.</p>
+      <div class="thumbs" id="thumbs"></div>
+      <div class="status" id="labStatus" hidden></div>
+      <div id="review" hidden></div>
+    </div>
+    <div class="card chart" id="chartCard" hidden></div>
+    <div>
+      <div class="sec-h"><h2>수치 추이</h2><span class="small muted">항목을 누르면 그래프 · 날짜를 누르면 수정</span></div>
+      <div id="labTable"></div>
+    </div>
+  </section>
+
+  <!-- 실비 -->
+  <section id="v-claim" hidden style="flex-direction:column;gap:14px">
+    <div class="sum" id="claimSum"></div>
+    <div class="sec-h" style="margin:0">
+      <div class="filters" id="claimFilter">
+        <button data-f="all" aria-pressed="true">전체</button>
+        <button data-f="todo" aria-pressed="false">할 일 남음</button>
+        <button data-f="done" aria-pressed="false">청구 완료</button>
+      </div>
+      <button class="btn primary" id="addClaim">+ 추가</button>
+    </div>
+    <ul class="claims" id="claimList"></ul>
+  </section>
+</div></main>
+
+<div id="sheetRoot"></div>
+<div class="scrim" id="login" hidden style="align-items:center;background:var(--bg)"><form class="sheet" id="lgForm" style="border-radius:16px;max-width:380px" novalidate>
+  <h2 style="font-family:var(--font-display);font-size:22px">엄마 항암 수첩</h2>
+  <p class="small muted" style="margin:0">가족 비밀번호를 넣어 주세요. 한 번 넣으면 이 기기에서는 다시 묻지 않아요.</p>
+  <div class="field"><label for="lgName">기록하는 사람</label><input class="inp" id="lgName" autocomplete="nickname" placeholder="예: 딸, 아빠"></div>
+  <div class="field"><label for="lgPw">가족 비밀번호</label><input class="inp" id="lgPw" type="password" autocomplete="current-password"></div>
+  <p class="small" id="lgMsg" style="color:var(--high);min-height:1.2em;margin:0" aria-live="polite"></p>
+  <div class="acts"><button class="btn primary" type="submit" style="flex:1">들어가기</button></div>
+</form></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+"use strict";
+/* ---------- 상수 ---------- */
+const SCHED_TYPES=["항암","외래","입원","검사","요양","타병원"];
+const CLAIM_PURPOSES=["항암","입원","검사/외래","요양","기타"];
+const COND=["좋음","보통","힘듦","많이 힘듦"];
+const LAB_ITEMS=[
+  {k:"ALB",n:"알부민",g:"간기능",lo:3.3,hi:5.3,u:"g/dL"},
+  {k:"AST",n:"AST",g:"간기능",lo:13,hi:34,u:"U/L"},
+  {k:"ALT",n:"ALT",g:"간기능",lo:5,hi:46,u:"U/L"},
+  {k:"TBIL",n:"빌리루빈(T.b)",g:"담즙(황달)",lo:0.5,hi:1.8,u:"mg/dL"},
+  {k:"DBIL",n:"직접빌리루빈(D.b)",g:"담즙(황달)",lo:null,hi:0.4,u:"mg/dL"},
+  {k:"TP",n:"총단백(T.P)",g:"간기능",lo:6.4,hi:8.3,u:"g/dL"},
+  {k:"ALP",n:"ALP",g:"담도",lo:30,hi:115,u:"IU/L"},
+  {k:"GGT",n:"γ-GT",g:"담도",lo:8,hi:35,u:"IU/L"},
+  {k:"LDH",n:"LDH",g:"세포손상",lo:119,hi:247,u:"U/L"},
+  {k:"PCT",n:"Procalcitonin",g:"감염(염증)",lo:null,hi:null,u:"ng/mL"},
+  {k:"CRP",n:"CRP",g:"감염(염증)",lo:0,hi:8,u:""},
+  {k:"WBC",n:"백혈구(WBC)",g:"면역",lo:4,hi:10,u:"×10³/μL"},
+  {k:"ANC",n:"ANC",g:"면역",lo:2,hi:7,u:"×10³/μL",per:true},
+  {k:"HB",n:"Hb",g:"빈혈",lo:12,hi:14,u:"g/dL"},
+  {k:"PLT",n:"혈소판(PLT)",g:"빈혈",lo:150,hi:450,u:"×10³/μL"},
+  {k:"CEA",n:"CEA",g:"종양표지",lo:0,hi:5,u:"ng/mL"},
+  {k:"CA199",n:"CA19-9",g:"종양표지",lo:0,hi:34,u:"U/mL"},
+  {k:"GFR",n:"GFR",g:"신장기능",lo:60,hi:null,u:""},
+  {k:"BUN",n:"BUN",g:"신장기능",lo:null,hi:null,u:"mg/dL"},
+  {k:"CR",n:"Cr",g:"신장기능",lo:null,hi:null,u:"mg/dL"},
+  {k:"CA",n:"칼슘(Ca)",g:"전해질",lo:8.8,hi:10.5,u:"mg/dL"},
+  {k:"PHOS",n:"인(P)",g:"전해질",lo:2.5,hi:4.5,u:"mg/dL"},
+  {k:"NA",n:"나트륨(Na)",g:"전해질",lo:135,hi:145,u:"mmol/L"},
+  {k:"K",n:"칼륨(K)",g:"전해질",lo:3.5,hi:5.1,u:"mmol/L"}
+];
+/* 화면 항목명 → 코드 (모델이 key를 못 붙였을 때 보정) */
+const ALIASES=[
+  [/^(t\.?\s*b(il)?(irubin)?|total\s*bil|총\s*빌리)/i,"TBIL"],[/^(d\.?\s*b(il)?|direct\s*bil|직접\s*빌리)/i,"DBIL"],
+  [/^(t\.?\s*p(rot(ein)?)?|total\s*prot|총\s*단백)/i,"TP"],[/^(alb|알부민)/i,"ALB"],
+  [/^(ast|got|s?got)\b/i,"AST"],[/^(alt|gpt|s?gpt)\b/i,"ALT"],[/^(alp|alk)/i,"ALP"],[/^(γ|r|g)[\s-]*(gt|gtp)|^ggt/i,"GGT"],
+  [/^ldh/i,"LDH"],[/^procal/i,"PCT"],[/^(hs-?)?crp/i,"CRP"],[/^(wbc|백혈구)/i,"WBC"],[/^(anc|absolute neut|절대\s*호중구)/i,"ANC"],
+  [/^(hb|hgb|hemoglobin|혈색소)/i,"HB"],[/^(plt|platelet|혈소판)/i,"PLT"],[/^cea/i,"CEA"],[/^ca\s*19/i,"CA199"],
+  [/^(e?gfr)/i,"GFR"],[/^bun/i,"BUN"],[/^(cr\b|creat|크레아)/i,"CR"],[/^(ca\b|ca,|calcium|칼슘)/i,"CA"],
+  [/^(p\b|phos|인$)/i,"PHOS"],[/^(na\b|sodium|나트륨)/i,"NA"],[/^(k\b|potassium|칼륨)/i,"K"]
+];
+function keyFor(name,key){if(key&&ITEM[key])return key;const n=String(name||"").trim();for(const [re,k] of ALIASES)if(re.test(n))return k;return n||null}
+const ITEM=Object.fromEntries(LAB_ITEMS.map(i=>[i.k,i]));
+const KINDS={
+  meal:{label:"식사",fields:[{k:"time",l:"시간",t:"time"},{k:"amount",l:"먹은 양",t:"select",o:["다 먹음","반 정도","조금","못 먹음"]},{k:"food",l:"먹은 것",t:"text",full:1,ph:"예: 흰죽 반 공기, 계란찜"},{k:"note",l:"메모",t:"text",full:1}]},
+  urine:{label:"소변",fields:[{k:"time",l:"시간",t:"time"},{k:"amount",l:"양",t:"select",o:["보통","많음","적음"]},{k:"note",l:"색·특이사항",t:"text",full:1}]},
+  stool:{label:"대변",fields:[{k:"time",l:"시간",t:"time"},{k:"state",l:"상태",t:"select",o:["보통","묽음","설사","단단함","검은 변·혈변"]},{k:"note",l:"메모",t:"text",full:1}]},
+  vital:{label:"체온·혈압",fields:[{k:"time",l:"잰 시간",t:"time"},{k:"temp",l:"체온(℃)",t:"number",step:"0.1"},{k:"sys",l:"수축기 혈압",t:"number"},{k:"dia",l:"이완기 혈압",t:"number"},{k:"pulse",l:"맥박",t:"number"},{k:"spo2",l:"산소포화도(%)",t:"number"},{k:"note",l:"메모",t:"text",full:1,ph:"예: 해열제 주사 맞음"}]},
+  med:{label:"투약",fields:[{k:"time",l:"시간",t:"time"},{k:"dose",l:"용량",t:"text",ph:"예: 1알"},{k:"name",l:"약 이름",t:"text",full:1,ph:"예: 항구토제, 타이레놀"},{k:"note",l:"메모",t:"text",full:1}]},
+  test:{label:"검사",fields:[{k:"time",l:"시간",t:"time"},{k:"tkind",l:"검사 종류",t:"text",list:["CT","MRI","PET-CT","초음파","X-ray","내시경","병리검사","피검사"]},{k:"result",l:"결과",t:"textarea",full:1}]}
+};
+const KIND_ORDER=["meal","urine","stool","vital","med","test"];
+
+/* ---------- 유틸 ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const parseYmd=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+const DOW="일월화수목금토";
+const fmtDay=s=>{const d=parseYmd(s);return (d.getMonth()+1)+"월 "+d.getDate()+"일 ("+DOW[d.getDay()]+")"};
+const fmtShort=s=>{if(!s)return"";const d=parseYmd(s);return (d.getFullYear()%100)+"."+(d.getMonth()+1)+"."+d.getDate()};
+const nowTime=()=>{const d=new Date();return pad(d.getHours())+":"+pad(d.getMinutes())};
+const num=v=>{if(v===""||v==null)return null;const n=parseFloat(String(v).replace(/,/g,""));return isFinite(n)?n:null};
+function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,2200)}
+function parseRef(r){const m=String(r||"").match(/(-?[\d.]+)?\s*[~\-–]\s*(-?[\d.]+)/);if(!m)return null;return {lo:m[1]!=null?parseFloat(m[1]):null,hi:parseFloat(m[2])}}
+function flagOf(k,v,ref){
+  const it=ITEM[k]; if(v==null)return "";
+  const r=parseRef(ref)||it; if(!r)return "";
+  let x=v; if(!ref&&it&&it.per&&x>100)x=x/1000;
+  if(r.hi!=null&&x>r.hi)return "hi"; if(r.lo!=null&&x<r.lo)return "lo"; return "";
+}
+const showVal=(c,k)=>{const v=c.values?.[k];if(v==null)return"";return (c.quals?.[k]||"")+v}
+
+/* ---------- 상태 ---------- */
+const S={schedules:[],days:{},entries:[],labs:[],claims:[]};
+let db=null, user=null, myId=null, canWrite=true;
+let selDate=ymd(new Date()); let viewY=new Date().getFullYear(), viewM=new Date().getMonth();
+let chartKey=null, claimFilter="all";
+const names={};
+
+/* ---------- 탭 ---------- */
+function showView(v){
+  document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.v===v)));
+  for(const id of ["cal","lab","claim"]){const el=$("#v-"+id);el.hidden=id!==v;if(id===v)el.style.display="flex"}
+  try{localStorage.setItem("tab",v)}catch(e){}
+}
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>showView(b.dataset.v));
+try{const t=localStorage.getItem("tab");if(t&&["cal","lab","claim"].includes(t))showView(t)}catch(e){}
+
+/* ---------- 쓰기 ---------- */
+function guard(){ if(!db){toast("저장할 수 없어요. 새로고침해 주세요.");return false} if(!myId){showLogin();return false} if(!canWrite){toast("보기 전용 권한이라 저장할 수 없어요.");return false} return true }
+async function save(coll,id,data){
+  if(!guard())return false;
+  try{
+    const body={...data,updatedAt:Date.now(),updatedBy:myId||null};
+    if(id) await db.collection(coll).doc(id).set(body);
+    else await db.collection(coll).add({...body,createdAt:Date.now(),createdBy:myId||null});
+    return true;
+  }catch(e){toast(e&&e.code==="permission_denied"?"저장 권한이 없어요.":"저장하지 못했어요. 잠시 후 다시 해 주세요.");return false}
+}
+async function remove(coll,id){
+  if(!guard())return false;
+  try{await db.collection(coll).doc(id).delete();return true}catch(e){toast("삭제하지 못했어요.");return false}
+}
+
+/* ---------- 바텀시트 폼 ---------- */
+function fieldHtml(f,val){
+  const id="f_"+f.k, v=val??"";
+  let inp;
+  if(f.t==="select") inp=`<select class="inp" id="${id}">${f.o.map(o=>`<option ${o===v?"selected":""}>${esc(o)}</option>`).join("")}</select>`;
+  else if(f.t==="textarea") inp=`<textarea class="inp" id="${id}" placeholder="${esc(f.ph||"")}">${esc(v)}</textarea>`;
+  else if(f.t==="check") return `<label class="chk full"><input type="checkbox" id="${id}" ${v?"checked":""}> ${esc(f.l)}</label>`;
+  else inp=`<input class="inp" id="${id}" type="${f.t==="number"?"number":f.t}" ${f.step?`step="${f.step}"`:""} ${f.t==="number"?'inputmode="decimal"':""} value="${esc(v)}" placeholder="${esc(f.ph||"")}" ${f.list?`list="${id}_l"`:""}>${f.list?`<datalist id="${id}_l">${f.list.map(o=>`<option value="${esc(o)}">`).join("")}</datalist>`:""}`;
+  return `<div class="field ${f.full?"full":""}"><label for="${id}">${esc(f.l)}</label>${inp}</div>`;
+}
+function openSheet({title,fields,values,onSave,onDelete,extraHtml}){
+  const root=$("#sheetRoot");
+  root.innerHTML=`<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}">
+    <h2>${esc(title)}</h2>
+    <div class="fields">${fields.map(f=>fieldHtml(f,values?.[f.k])).join("")}</div>
+    ${extraHtml||""}
+    <div class="confirm" id="delConfirm" hidden>한 번 더 누르면 삭제돼요.</div>
+    <div class="acts">${onDelete?'<button class="btn danger" id="sDel">삭제</button>':""}<span class="spacer"></span><button class="btn" id="sCancel">취소</button><button class="btn primary" id="sSave">저장</button></div>
+  </div></div>`;
+  const close=()=>{root.innerHTML=""};
+  $("#scrim").addEventListener("click",e=>{if(e.target.id==="scrim")close()});
+  $("#sCancel").onclick=close;
+  if(onDelete){let armed=false;$("#sDel").onclick=async()=>{if(!armed){armed=true;$("#delConfirm").hidden=false;return}if(await onDelete())close()}}
+  $("#sSave").onclick=async()=>{
+    const out={};
+    for(const f of fields){const el=$("#f_"+f.k);if(!el)continue;out[f.k]=f.t==="check"?el.checked:f.t==="number"?num(el.value):el.value.trim()}
+    $("#sSave").disabled=true;
+    const ok=await onSave(out);
+    if(ok!==false)close(); else $("#sSave").disabled=false;
+  };
+  const first=root.querySelector("input:not([type=checkbox]),select,textarea"); if(first&&window.matchMedia("(pointer:fine)").matches)first.focus();
+}
+
+/* ---------- 캘린더 ---------- */
+function schedOn(d){return S.schedules.filter(s=>s.date&&(s.date===d||(s.endDate&&s.date<=d&&d<=s.endDate)))}
+function entriesOn(d){return S.entries.filter(e=>e.date===d).sort((a,b)=>(a.time||"99").localeCompare(b.time||"99"))}
+function maxTemp(d){let m=null;for(const e of S.entries)if(e.date===d&&e.kind==="vital"&&e.temp!=null)m=m==null?e.temp:Math.max(m,e.temp);return m}
+function renderCal(){
+  $("#mLabel").textContent=viewY+"년 "+(viewM+1)+"월";
+  const first=new Date(viewY,viewM,1), start=new Date(first); start.setDate(1-first.getDay());
+  const today=ymd(new Date());
+  let h=[..."일월화수목금토"].map((c,i)=>`<div class="dow ${i===0?"sun":i===6?"sat":""}">${c}</div>`).join("");
+  for(let i=0;i<42;i++){
+    const d=new Date(start); d.setDate(start.getDate()+i);
+    if(i>=35&&d.getMonth()!==viewM)break;
+    const s=ymd(d), sc=schedOn(s), t=maxTemp(s);
+    const has=S.entries.some(e=>e.date===s)||S.days[s];
+    h+=`<button class="day ${d.getMonth()!==viewM?"out":""} ${s===today?"today":""} ${s===selDate?"sel":""}" data-d="${s}" aria-label="${fmtDay(s)}">
+      <span class="dn">${d.getDate()}</span>
+      ${sc.slice(0,2).map(x=>`<span class="chip-t t-${esc(x.type)}">${esc(x.type)}</span>`).join("")}
+      <span class="dots">${t!=null&&t>=38?'<i class="dot fever"></i>':t!=null&&t>=37.5?'<i class="dot warm"></i>':""}${has?'<i class="dot"></i>':""}</span>
+    </button>`;
+  }
+  $("#cal").innerHTML=h;
+  $("#cal").querySelectorAll(".day").forEach(b=>b.onclick=()=>{selDate=b.dataset.d;const d=parseYmd(selDate);if(d.getMonth()!==viewM){viewY=d.getFullYear();viewM=d.getMonth()}renderCal();renderDay()});
+}
+$("#prevM").onclick=()=>{viewM--;if(viewM<0){viewM=11;viewY--}renderCal()};
+$("#nextM").onclick=()=>{viewM++;if(viewM>11){viewM=0;viewY++}renderCal()};
+
+function entrySummary(e){
+  const p=[];
+  switch(e.kind){
+    case"meal":if(e.food)p.push(esc(e.food));if(e.amount)p.push(`<span class="muted">${esc(e.amount)}</span>`);break;
+    case"urine":p.push(esc(e.amount||""));break;
+    case"stool":p.push(e.state&&/설사|혈변/.test(e.state)?`<span class="flag-warn">${esc(e.state)}</span>`:esc(e.state||""));break;
+    case"vital":
+      if(e.temp!=null)p.push(`<span class="${e.temp>=38?"flag-high":e.temp>=37.5?"flag-warn":""}">${e.temp}℃</span>`);
+      if(e.sys!=null||e.dia!=null)p.push(`${e.sys??"–"}/${e.dia??"–"} mmHg`);
+      if(e.pulse!=null)p.push(`맥박 ${e.pulse}`);
+      if(e.spo2!=null)p.push(`SpO₂ ${e.spo2}%`);break;
+    case"med":p.push(esc(e.name||""));if(e.dose)p.push(`<span class="muted">${esc(e.dose)}</span>`);break;
+    case"test":p.push(`<b>${esc(e.tkind||"")}</b>`);if(e.result)p.push(esc(e.result));break;
+  }
+  if(e.note)p.push(`<span class="muted">${esc(e.note)}</span>`);
+  return p.filter(Boolean).join(" · ");
+}
+function renderDay(){
+  const d=selDate, sc=schedOn(d), en=entriesOn(d), day=S.days[d]||{};
+  const cnt=k=>en.filter(e=>e.kind===k).length;
+  const el=$("#dayPanel");
+  el.innerHTML=`
+    <div class="day-h"><span class="d">${fmtDay(d)}</span><button class="btn" id="addSched">+ 치료 일정</button></div>
+    <div class="sched">${sc.map(s=>`<button class="sched-item" data-id="${s.id}"><span class="pill t-${esc(s.type)}">${esc(s.type)}</span><span class="body"><span class="hosp">${esc(s.hospital||"병원 미입력")}</span>${s.endDate?` <span class="small muted">${fmtShort(s.date)}~${fmtShort(s.endDate)}</span>`:""}<br><span>${esc(s.content||"")}</span>${s.note?`<br><span class="small muted">${esc(s.note)}</span>`:""}</span></button>`).join("")}</div>
+    <div class="basics">
+      <div class="field"><label for="wt">체중</label><div class="with-unit"><input class="inp" id="wt" type="number" step="0.1" inputmode="decimal" value="${day.weight??""}" placeholder="0.0"><span class="muted">kg</span></div></div>
+      <div class="field"><span class="flabel">컨디션</span><div class="cond" id="cond">${COND.map(c=>`<button aria-pressed="${day.condition===c}">${c}</button>`).join("")}</div></div>
+      <div class="field" style="grid-column:1/-1"><label for="memo">오늘 메모·특이사항</label><textarea class="inp" id="memo" placeholder="예: 오후부터 메스꺼움, 입맛 없음">${esc(day.memo||"")}</textarea></div>
+    </div>
+    <div class="quick">${KIND_ORDER.map(k=>`<button data-k="${k}"><b>+</b> ${KINDS[k].label}</button>`).join("")}</div>
+    <div class="counts"><span>식사 ${cnt("meal")}회</span><span>소변 ${cnt("urine")}회</span><span>대변 ${cnt("stool")}회</span><span>투약 ${cnt("med")}건</span></div>
+    ${en.length?`<ul class="tl">${en.map(e=>`<li><button data-id="${e.id}"><span class="tm">${esc(e.time||"–")}</span><span class="k">${KINDS[e.kind]?.label||""}</span><span class="v">${entrySummary(e)}${e.createdBy?` <span class="by" data-uid="${esc(e.createdBy)}"></span>`:""}</span></button></li>`).join("")}</ul>`:`<p class="empty">이 날 기록이 아직 없어요. 위 버튼으로 식사·소변·체온 등을 추가하세요.</p>`}
+  `;
+  $("#addSched").onclick=()=>editSchedule(null);
+  el.querySelectorAll(".sched-item").forEach(b=>b.onclick=()=>editSchedule(S.schedules.find(s=>s.id===b.dataset.id)));
+  el.querySelectorAll(".quick button").forEach(b=>b.onclick=()=>editEntry(b.dataset.k,null));
+  el.querySelectorAll(".tl button").forEach(b=>b.onclick=()=>{const e=S.entries.find(x=>x.id===b.dataset.id);editEntry(e.kind,e)});
+  const saveDay=patch=>save("days",d,{...(S.days[d]||{}),...patch,date:d});
+  $("#wt").onchange=e=>saveDay({weight:num(e.target.value)});
+  $("#memo").onchange=e=>saveDay({memo:e.target.value.trim()});
+  el.querySelectorAll("#cond button").forEach(b=>b.onclick=()=>{const c=b.textContent;saveDay({condition:day.condition===c?null:c})});
+  fillNames();
+}
+function editEntry(kind,e){
+  const K=KINDS[kind]; const fields=K.fields;
+  const vals=e?{...e}:{time:nowTime()};
+  openSheet({title:K.label+" · "+fmtDay(e?e.date:selDate),fields,values:vals,
+    onSave:o=>{if(kind==="test"&&!o.tkind&&!o.result){toast("검사 종류나 결과를 적어 주세요.");return false}
+      const base=e?{...e}:{};delete base.id;return save("entries",e?.id,{...base,...o,kind,date:e?e.date:selDate})},
+    onDelete:e?()=>remove("entries",e.id):null});
+}
+function editSchedule(s){
+  const fields=[
+    {k:"date",l:"날짜",t:"date"},{k:"endDate",l:"종료일(입원·요양)",t:"date"},
+    {k:"type",l:"구분",t:"select",o:SCHED_TYPES},{k:"hospital",l:"병원명",t:"text",list:hospitalList()},
+    {k:"content",l:"치료 내용",t:"text",full:1,ph:"예: 젬시타빈 6차 1회"},{k:"note",l:"메모",t:"text",full:1}
+  ];
+  if(!s)fields.push({k:"toClaim",l:"실비 서류 목록에도 추가",t:"check"});
+  openSheet({title:s?"치료 일정 수정":"치료 일정 추가",fields,values:s||{date:selDate,type:"항암",toClaim:true},
+    onSave:async o=>{
+      if(!o.date){toast("날짜를 넣어 주세요.");return false}
+      if(o.endDate&&o.endDate<o.date){toast("종료일이 시작일보다 빨라요.");return false}
+      const toClaim=o.toClaim; delete o.toClaim;
+      const base=s?{...s}:{}; delete base.id;
+      const ok=await save("schedules",s?.id,{...base,...o});
+      if(ok&&toClaim){await save("claims",null,{hospital:o.hospital,start:o.date,end:o.endDate||"",purpose:o.type==="항암"?"항암":o.type==="입원"?"입원":o.type==="요양"?"요양":"검사/외래",docs:false,claimed:false,note:o.content||""})}
+      return ok;
+    },
+    onDelete:s?()=>remove("schedules",s.id):null});
+}
+function hospitalList(){return [...new Set([...S.schedules.map(s=>s.hospital),...S.claims.map(c=>c.hospital),...S.labs.map(l=>l.hospital)].filter(Boolean))]}
+
+/* ---------- 피검사 ---------- */
+let sample=null;
+function labCols(){return [...S.labs].sort((a,b)=>(a.date||"").localeCompare(b.date||"")||(a.createdAt||0)-(b.createdAt||0))}
+function renderLabs(){
+  const cols=labCols();
+  if(!cols.length){$("#labTable").innerHTML=`<div class="card empty">아직 저장된 피검사 결과가 없어요. 위에서 캡처를 올리거나 직접 입력하세요.</div>`;$("#chartCard").hidden=true;return}
+  const extra=[...new Set(cols.flatMap(c=>Object.keys(c.values||{})).filter(k=>!ITEM[k]))];
+  const rows=[...LAB_ITEMS.filter(i=>cols.some(c=>c.values?.[i.k]!=null)||["ALB","AST","ALT","TBIL","ALP","GGT","ANC","HB","CEA","CA199"].includes(i.k)),...extra.map(k=>({k,n:k,g:"기타",lo:null,hi:null}))];
+  let h=`<div class="table-wrap"><table class="lab"><thead><tr><th class="name">항목 <span class="rg">정상범위</span></th>${cols.map(c=>`<th><button data-id="${c.id}">${fmtShort(c.date)}<span class="h">${esc(c.hospital||"")}</span></button></th>`).join("")}</tr></thead><tbody>`;
+  let g=null;
+  for(const r of rows){
+    if(r.g!==g){g=r.g;h+=`<tr class="grp"><td class="name">${esc(g)}</td><td colspan="${cols.length}"></td></tr>`}
+    const rg=r.lo!=null||r.hi!=null?`${r.lo??""}~${r.hi??""}`:"";
+    h+=`<tr class="${chartKey===r.k?"on":""}"><td class="name"><button data-k="${esc(r.k)}">${esc(r.n)}</button><span class="rg">${rg}</span></td>${cols.map(c=>{const v=c.values?.[r.k];const f=flagOf(r.k,v,c.refs?.[r.k]);return `<td class="${f}" ${c.refs?.[r.k]?`title="참고치 ${esc(c.refs[r.k])}"`:""}>${v==null?"":esc(showVal(c,r.k))+(f==="hi"?" ▲":f==="lo"?" ▼":"")}</td>`}).join("")}</tr>`;
+  }
+  h+=`</tbody></table></div><p class="small muted" style="margin:8px 2px 0">▲▼ 표시는 캡처에 참고치가 있으면 그 병원 참고치로, 없으면 왼쪽 기본 범위로 판단해요.</p>`;
+  $("#labTable").innerHTML=h;
+  $("#labTable").querySelectorAll("thead button").forEach(b=>b.onclick=()=>openReview(S.labs.find(l=>l.id===b.dataset.id)));
+  $("#labTable").querySelectorAll(".name button").forEach(b=>b.onclick=()=>{chartKey=chartKey===b.dataset.k?null:b.dataset.k;renderLabs()});
+  renderChart(cols);
+}
+function renderChart(cols){
+  const card=$("#chartCard");
+  if(!chartKey){card.hidden=true;return}
+  const it=ITEM[chartKey]||{n:chartKey,lo:null,hi:null,u:""};
+  const pts=cols.filter(c=>c.values?.[chartKey]!=null&&c.date).map(c=>({d:parseYmd(c.date).getTime(),v:c.values[chartKey],s:c.date,ref:c.refs?.[chartKey]}));
+  card.hidden=false;
+  if(pts.length<1){card.innerHTML=`<h2>${esc(it.n)}</h2><p class="empty">값이 있는 날짜가 없어요.</p>`;return}
+  const W=600,H=220,L=44,R=16,T=16,B=34;
+  let vmin=Math.min(...pts.map(p=>p.v)),vmax=Math.max(...pts.map(p=>p.v));
+  if(it.lo!=null){vmin=Math.min(vmin,it.lo)} if(it.hi!=null){vmax=Math.max(vmax,it.hi)}
+  if(vmin===vmax){vmin-=1;vmax+=1} const padv=(vmax-vmin)*0.1; vmin=Math.max(0,vmin-padv); vmax+=padv;
+  const dmin=pts[0].d,dmax=pts[pts.length-1].d;
+  const x=d=>dmax===dmin?L+(W-L-R)/2:L+(d-dmin)/(dmax-dmin)*(W-L-R);
+  const y=v=>T+(1-(v-vmin)/(vmax-vmin))*(H-T-B);
+  const ticks=4,tv=[...Array(ticks+1)].map((_,i)=>vmin+(vmax-vmin)*i/ticks);
+  const fmt=v=>Math.abs(v)>=100?Math.round(v):Math.round(v*10)/10;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(it.n)} 추이">`;
+  for(const v of tv)s+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${fmt(v)}</text>`;
+  if(it.lo!=null||it.hi!=null){const y1=y(it.hi??vmax),y2=y(it.lo??vmin);s+=`<rect x="${L}" y="${y1}" width="${W-L-R}" height="${Math.max(0,y2-y1)}" fill="var(--accent-soft)" opacity=".8"/>`}
+  const path=pts.map((p,i)=>(i?"L":"M")+x(p.d).toFixed(1)+" "+y(p.v).toFixed(1)).join(" ");
+  s+=`<path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2.2"/>`;
+  pts.forEach((p,i)=>{const f=flagOf(chartKey,p.v,p.ref);const c=f==="hi"?"var(--high)":f==="lo"?"var(--low)":"var(--accent)";const last=i===pts.length-1;
+    s+=`<circle cx="${x(p.d)}" cy="${y(p.v)}" r="${last?5:3.5}" fill="${c}" stroke="var(--surface)" stroke-width="1.5"/>`;
+    if(last||i===0||pts.length<=6)s+=`<text x="${x(p.d)}" y="${H-12}" text-anchor="middle">${fmtShort(p.s).slice(3)}</text>`;
+    if(last)s+=`<text x="${Math.min(x(p.d),W-R-4)}" y="${y(p.v)-10}" text-anchor="end" style="fill:${c};font-weight:600">${p.v}</text>`});
+  s+=`</svg>`;
+  card.innerHTML=`<div class="sec-h"><h2>${esc(it.n)} <span class="small muted">${esc(it.u||"")}</span></h2><button class="btn" id="closeChart">닫기</button></div>${s}<p class="small muted" style="margin:6px 0 0">색칠된 띠가 정상범위예요.</p>`;
+  $("#closeChart").onclick=()=>{chartKey=null;renderLabs()};
+}
+
+function openReview(rec,prefill){
+  // rec: 기존 기록 수정, prefill: 캡처 인식 결과
+  const box=$("#review");
+  const vals={...(rec?.values||{})}, units={...(rec?.units||{})};
+  let date=rec?.date||ymd(new Date()), hospital=rec?.hospital||"";
+  const extraNames={};
+  if(prefill){
+    if(prefill.date&&/^\d{4}-\d{2}-\d{2}$/.test(prefill.date))date=prefill.date;
+    if(prefill.hospital)hospital=prefill.hospital;
+    for(const it of prefill.items||[]){
+      const v=num(it.value); if(v==null)continue;
+      const k=it.key&&ITEM[it.key]?it.key:(String(it.name||"").trim()||null); if(!k)continue;
+      vals[k]=v; if(it.unit)units[k]=it.unit; if(!ITEM[k])extraNames[k]=1;
+    }
+  }
+  const keys=[...LAB_ITEMS.map(i=>i.k),...Object.keys(vals).filter(k=>!ITEM[k])];
+  box.hidden=false;
+  box.innerHTML=`<div class="sec-h" style="margin-top:6px"><h2>${rec?"검사 결과 수정":"확인 후 저장"}</h2></div>
+    ${prefill?`<p class="small muted" style="margin:0 0 10px">캡처에서 읽은 값이에요. 원본과 맞는지 확인해 주세요.</p>`:""}
+    <div class="review-grid">
+      <div class="field"><label for="rvDate">검사일</label><input class="inp" id="rvDate" type="date" value="${esc(date)}"></div>
+      <div class="field"><label for="rvHosp">병원</label><input class="inp" id="rvHosp" value="${esc(hospital)}" list="rvHospL"><datalist id="rvHospL">${hospitalList().map(h=>`<option value="${esc(h)}">`).join("")}</datalist></div>
+      ${keys.map((k,i)=>{const it=ITEM[k];const v=vals[k];const f=flagOf(k,v);return `<div class="field rv"><label class="flabel" for="rv_${i}"><b>${esc(it?it.n:k)}</b> ${it&&(it.lo!=null||it.hi!=null)?`<span>${it.lo??""}~${it.hi??""}</span>`:""}</label><input class="inp ${f?"flag-"+(f==="hi"?"high":"warn"):""}" id="rv_${i}" data-k="${esc(k)}" type="text" inputmode="decimal" value="${v??""}" placeholder="${esc(units[k]||it?.u||"")}"></div>`}).join("")}
+      <div class="field" style="grid-column:1/-1"><label for="rvNote">메모</label><input class="inp" id="rvNote" value="${esc(rec?.note||"")}"></div>
+    </div>
+    <div class="confirm" id="rvDelC" hidden>한 번 더 누르면 이 날짜 결과가 삭제돼요.</div>
+    <div class="acts" style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap">${rec?'<button class="btn danger" id="rvDel">삭제</button><span style="flex:1"></span>':""}<button class="btn" id="rvCancel">취소</button><button class="btn primary" id="rvSave">저장</button></div>`;
+  box.scrollIntoView({behavior:"smooth",block:"start"});
+  if(rec){$("#tab-lab").click()}
+  $("#rvCancel").onclick=()=>{box.hidden=true;box.innerHTML="";$("#thumbs").innerHTML="";setStatus("")};
+  if(rec){let armed=false;$("#rvDel").onclick=async()=>{if(!armed){armed=true;$("#rvDelC").hidden=false;return}if(await remove("labs",rec.id)){$("#rvCancel").click();toast("삭제했어요")}}}
+  $("#rvSave").onclick=async()=>{
+    const out={};box.querySelectorAll("input[data-k]").forEach(i=>{const v=num(i.value);if(v!=null)out[i.dataset.k]=v});
+    const d=$("#rvDate").value; if(!d){toast("검사일을 넣어 주세요.");return}
+    if(!Object.keys(out).length){toast("수치를 하나 이상 넣어 주세요.");return}
+    const u={};for(const k in out)if(units[k])u[k]=units[k];
+    const base=rec?{...rec}:{};delete base.id;
+    if(base.quals){const q={};for(const k in base.quals)if(k in out)q[k]=base.quals[k];base.quals=q}
+    $("#rvSave").disabled=true;
+    if(await save("labs",rec?.id,{...base,date:d,hospital:$("#rvHosp").value.trim(),values:out,units:u,note:$("#rvNote").value.trim(),source:rec?.source||(prefill?"capture":"manual")})){toast("저장했어요");$("#rvCancel").click()}
+    else $("#rvSave").disabled=false;
+  };
+}
+function setStatus(t){const s=$("#labStatus");s.textContent=t;s.hidden=!t}
+$("#manualLab").onclick=()=>openReview(null,null);
+const CAP_PROMPT=(n,year,today)=>`첨부한 이미지는 한국 병원 앱의 검사결과 화면 캡처입니다(${n}장). 화면 모양은 여러 가지입니다.
+(가) 한 날짜의 여러 항목 목록: 화면 위쪽의 보고일/검사일이 모든 행의 날짜입니다.
+(나) 한 항목의 '누적 정보' 팝업: 팝업 제목이 항목명이고, 각 행마다 날짜(보고일)·결과·참고치가 있습니다. 행마다 그 행의 날짜를 쓰세요.
+(다) 팝업 뒤로 어둡게 비치는 목록도 글자가 읽히면 (가)처럼 읽으세요. 날짜는 그 목록 위의 날짜입니다.
+화면 아래가 잘린 행도 숫자가 확실히 읽히면 넣고 partial을 true로 하세요. 확실하지 않은 숫자는 빼세요. 보이지 않는 값은 절대 만들지 마세요.
+
+JSON 객체 하나로만 답하세요:
+{"hospital":"병원명 또는 null","rows":[{"date":"YYYY-MM-DD","key":"코드 또는 null","name":"화면의 항목명 그대로","value":숫자,"qualifier":"> 또는 < 또는 빈 문자열","unit":"단위 또는 빈 문자열","ref":"참고치 원문(예: 0.20~1.20) 또는 빈 문자열","partial":false}]}
+
+규칙:
+- 같은 날짜에 같은 항목이 두 번 나오면 둘 다 각각 행으로 넣으세요.
+- '>54', '<0.5'처럼 부등호가 붙으면 qualifier에 부등호, value에 숫자만 넣으세요.
+- 숫자가 아닌 결과(음성, Negative 등)는 빼세요.
+- 날짜에 연도가 없으면 ${year}년. 오늘은 ${today}이므로 이보다 미래 날짜는 나올 수 없습니다.
+코드: ALB=알부민, TP=총단백(T.Protein), AST=AST(GOT), ALT=ALT(GPT), TBIL=총빌리루빈(T.B, T.Bil, Total bilirubin), DBIL=직접빌리루빈(D.B, D.Bil), ALP, GGT=γ-GT(r-GTP), LDH, PCT=Procalcitonin, CRP, WBC=백혈구, ANC=절대호중구수(호중구 %는 아님), HB=혈색소(Hb), PLT=혈소판, CEA, CA199=CA19-9, GFR=eGFR(계산식 이름이 붙어도 GFR), BUN, CR=크레아티닌, CA=칼슘(Ca, total), PHOS=인(P, Phosphorus), NA=나트륨, K=칼륨. 그 밖의 항목은 key를 null로 두세요.`;
+
+let capData=null;
+function sameLab(date){return S.labs.filter(l=>l.date===date).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0))[0]||null}
+function buildCapture(r){
+  // 날짜별 → 항목별 후보
+  const groups={};
+  for(const row of r.rows||[]){
+    const v=num(row.value); if(v==null)continue;
+    const d=String(row.date||"").trim(); if(!/^\d{4}-\d{2}-\d{2}$/.test(d))continue;
+    const k=keyFor(row.name,row.key); if(!k)continue;
+    const q=/^[<>]=?$/.test(String(row.qualifier||"").trim())?String(row.qualifier).trim():"";
+    (groups[d]??={}); (groups[d][k]??=[]);
+    if(!groups[d][k].some(c=>c.v===v&&c.q===q))groups[d][k].push({v,q,unit:String(row.unit||"").trim(),ref:String(row.ref||"").trim(),partial:!!row.partial,name:String(row.name||"")});
+  }
+  const dates=Object.keys(groups).sort().reverse();
+  return {hospital:r.hospital||"",dates:dates.map(d=>{
+    const ex=sameLab(d);
+    return {date:d,existing:ex,items:Object.entries(groups[d]).map(([k,cands])=>{
+      // 단위가 있고 부등호 없는 값을 우선
+      const sorted=[...cands].sort((a,b)=>(!!a.q-!!b.q)||(!a.unit-!b.unit));
+      const pick=sorted[0]; const old=ex?.values?.[k];
+      const status=old==null?"new":(old===pick.v&&(ex.quals?.[k]||"")===pick.q)?"same":"diff";
+      return {k,cands:sorted,pick:0,status,old:old==null?null:(ex.quals?.[k]||"")+old,on:status!=="same"};
+    }).sort((a,b)=>(LAB_ITEMS.findIndex(i=>i.k===a.k)+1||99)-(LAB_ITEMS.findIndex(i=>i.k===b.k)+1||99))};
+  })};
+}
+function renderCapture(){
+  const box=$("#review"); const D=capData; box.hidden=false;
+  const total=D.dates.reduce((n,g)=>n+g.items.filter(i=>i.on).length,0);
+  box.innerHTML=`<div class="sec-h" style="margin-top:6px"><h2>확인 후 저장</h2><span class="small muted">${D.dates.length}개 날짜</span></div>
+  <p class="small muted" style="margin:0 0 8px">캡처에서 읽은 값이에요. 원본과 맞는지 확인하고, 저장하지 않을 항목은 체크를 빼 주세요. 같은 날짜 기록이 있으면 거기에 합쳐져요.</p>
+  <div class="field" style="margin-bottom:10px"><label for="capHosp">병원</label><input class="inp" id="capHosp" value="${esc(D.hospital)}" list="capHospL"><datalist id="capHospL">${hospitalList().map(h=>`<option value="${esc(h)}">`).join("")}</datalist></div>
+  ${D.dates.map((g,gi)=>`<div class="cap-g">
+    <div class="cap-h"><input class="inp" type="date" id="capD_${gi}" data-g="${gi}" value="${g.date}"><span class="small muted">${g.existing?"기존 기록에 합치기":"새 날짜"}</span></div>
+    ${g.items.map((it,ii)=>{const c=it.cands[it.pick];const I=ITEM[it.k];const f=flagOf(it.k,c.v,c.ref);
+      return `<div class="cap-row ${it.on?"":"off"}">
+        <input type="checkbox" id="capC_${gi}_${ii}" data-g="${gi}" data-i="${ii}" ${it.on?"checked":""} aria-label="${esc(I?I.n:it.k)} 저장">
+        <label for="capC_${gi}_${ii}" class="cap-n"><b>${esc(I?I.n:it.k)}</b>${c.ref?` <span class="small muted">${esc(c.ref)}</span>`:""}
+          ${it.status==="same"?`<span class="small muted">· 이미 저장됨</span>`:it.status==="diff"?`<span class="small flag-warn">· 기존 ${esc(it.old)}</span>`:""}
+          ${c.partial?`<span class="small flag-warn">· 잘린 행</span>`:""}</label>
+        ${it.cands.length>1?`<select class="inp cap-v" data-g="${gi}" data-i="${ii}" data-sel="1">${it.cands.map((x,xi)=>`<option value="${xi}" ${xi===it.pick?"selected":""}>${esc(x.q+x.v)} ${esc(x.unit)}</option>`).join("")}</select>`
+          :`<input class="inp cap-v ${f==="hi"?"flag-high":f==="lo"?"flag-warn":""}" data-g="${gi}" data-i="${ii}" value="${esc(c.q+c.v)}" inputmode="decimal">`}
+        ${it.cands.length>1?`<span class="cap-alt small flag-warn">같은 날 값이 ${it.cands.length}개 있어요. 맞는 값을 골라 주세요.</span>`:""}
+      </div>`}).join("")}
+  </div>`).join("")}
+  <div class="acts" style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap"><button class="btn" id="capCancel">취소</button><button class="btn primary" id="capSave" ${total?"":"disabled"}>${total}개 저장</button></div>`;
+  box.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.onchange=()=>{D.dates[cb.dataset.g].items[cb.dataset.i].on=cb.checked;renderCapture()});
+  box.querySelectorAll('select.cap-v').forEach(sel=>sel.onchange=()=>{D.dates[sel.dataset.g].items[sel.dataset.i].pick=+sel.value;renderCapture()});
+  box.querySelectorAll('input.cap-v').forEach(inp=>inp.onchange=()=>{const it=D.dates[inp.dataset.g].items[inp.dataset.i];const c=it.cands[it.pick];const m=inp.value.trim().match(/^([<>]=?)?\s*(-?[\d.,]+)$/);if(m){c.q=m[1]||"";c.v=num(m[2])}else{toast("숫자로 넣어 주세요.");inp.value=c.q+c.v}});
+  box.querySelectorAll('input[type=date][data-g]').forEach(inp=>inp.onchange=()=>{const g=D.dates[inp.dataset.g];if(!inp.value){inp.value=g.date;return}g.date=inp.value;const ex=sameLab(g.date);g.existing=ex;for(const it of g.items){const old=ex?.values?.[it.k];it.old=old==null?null:(ex.quals?.[it.k]||"")+old;const c=it.cands[it.pick];it.status=old==null?"new":(old===c.v)?"same":"diff"}renderCapture()});
+  $("#capHosp").onchange=e=>{D.hospital=e.target.value.trim()};
+  $("#capCancel").onclick=()=>{capData=null;box.hidden=true;box.innerHTML="";$("#thumbs").innerHTML="";setStatus("")};
+  $("#capSave").onclick=async()=>{
+    $("#capSave").disabled=true; let n=0, ok=true;
+    // 같은 날짜로 묶인 그룹 합치기
+    const byDate={};for(const g of D.dates)for(const it of g.items)if(it.on)(byDate[g.date]??=[]).push(it);
+    for(const [d,items] of Object.entries(byDate)){
+      const ex=sameLab(d); const base=ex?{...ex}:{date:d,hospital:D.hospital,note:"",source:"capture"}; delete base.id;
+      const values={...(base.values||{})},quals={...(base.quals||{})},units={...(base.units||{})},refs={...(base.refs||{})};
+      for(const it of items){const c=it.cands[it.pick];values[it.k]=c.v;if(c.q)quals[it.k]=c.q;else delete quals[it.k];if(c.unit)units[it.k]=c.unit;if(c.ref)refs[it.k]=c.ref;n++}
+      if(!base.hospital&&D.hospital)base.hospital=D.hospital;
+      if(!await save("labs",ex?.id,{...base,values,quals,units,refs})){ok=false;break}
+    }
+    if(ok){toast(`${n}개 값을 저장했어요`);$("#capCancel").click()}else $("#capSave").disabled=false;
+  };
+  box.scrollIntoView({behavior:"smooth",block:"start"});
+}
+$("#labFile").onchange=async e=>{
+  const files=[...e.target.files]; e.target.value=""; if(!files.length)return;
+  $("#thumbs").innerHTML=files.map(f=>`<img alt="" src="${URL.createObjectURL(f)}">`).join("");
+  if(!sample){setStatus("자동 인식을 쓸 수 없어요. ‘직접 입력’을 눌러 주세요.");return}
+  let lim=null;try{lim=await sample.limits()}catch(_){}
+  if(!lim||!lim.images){setStatus("이 화면에서는 이미지 인식을 쓸 수 없어요. ‘직접 입력’을 눌러 주세요.");return}
+  const use=files.slice(0,lim.images.maxCount||files.length);
+  if(use.length<files.length)toast(`한 번에 ${use.length}장까지 읽어요. 나머지는 다시 올려 주세요.`);
+  setStatus("캡처에서 수치를 읽는 중… (1분 정도 걸려요)");
+  try{
+    const r=await sample.json(CAP_PROMPT(use.length,new Date().getFullYear(),ymd(new Date())),{images:use,modelTier:"complex"});
+    const D=buildCapture(r||{});
+    const cnt=D.dates.reduce((n,g)=>n+g.items.length,0);
+    if(!cnt){setStatus("수치를 찾지 못했어요. 결과 화면이 잘 보이게 다시 캡처하거나 ‘직접 입력’을 써 주세요.");return}
+    setStatus(`${D.dates.length}개 날짜, ${cnt}개 값을 읽었어요.`);
+    capData=D; renderCapture();
+  }catch(err){
+    const c=err&&err.code;
+    setStatus(c==="no_key"?"자동 인식 설정이 아직 안 됐어요. ‘직접 입력’을 써 주세요.":c==="permission_denied"?"다시 로그인해 주세요.":c==="not_granted"?"Claude 사용을 허용해야 자동 인식이 돼요. ‘직접 입력’으로도 넣을 수 있어요.":c==="rate_limited"?"요청이 많아요. 잠시 후 다시 올려 주세요.":c==="image_rejected"?"이미지를 읽을 수 없어요. 사진 파일(PNG·JPG)인지 확인해 주세요.":c==="invalid_json"?"읽은 내용을 정리하지 못했어요. 한 번 더 올려 주세요.":c==="cancelled"?"":"읽지 못했어요. 다시 올리거나 ‘직접 입력’을 써 주세요.");
+  }
+};
+
+/* ---------- 실비 ---------- */
+function renderClaims(){
+  const all=[...S.claims].sort((a,b)=>(b.start||"0").localeCompare(a.start||"0"));
+  const needDocs=all.filter(c=>!c.docs).length, needClaim=all.filter(c=>!c.claimed).length;
+  $("#claimSum").innerHTML=`<div><span class="small muted">서류 받아야 함</span><b>${needDocs}건</b></div><div><span class="small muted">청구 안 함</span><b>${needClaim}건</b></div>`;
+  const list=all.filter(c=>claimFilter==="all"||(claimFilter==="todo"?!(c.docs&&c.claimed):c.claimed));
+  $("#claimList").innerHTML=list.length?list.map(c=>`<li class="claim ${c.docs&&c.claimed?"done":""}">
+    <button class="info" data-id="${c.id}"><span class="row1"><span class="hosp">${esc(c.hospital||"병원 미입력")}</span><span class="pill t-${esc(c.purpose==="검사/외래"?"외래":c.purpose)}">${esc(c.purpose||"")}</span></span>
+    <span class="small muted">${c.start?fmtShort(c.start)+(c.end?" ~ "+fmtShort(c.end):""):"날짜 미입력"}</span>${c.note?`<span class="note">${esc(c.note)}</span>`:""}</button>
+    <span class="toggles"><button class="tg" data-id="${c.id}" data-f="docs" aria-pressed="${!!c.docs}"><span class="ic">${c.docs?"✓":"○"}</span>서류</button><button class="tg" data-id="${c.id}" data-f="claimed" aria-pressed="${!!c.claimed}"><span class="ic">${c.claimed?"✓":"○"}</span>청구</button></span>
+  </li>`).join(""):`<li class="card empty">${S.claims.length?"해당하는 항목이 없어요.":"아직 항목이 없어요. ‘+ 추가’로 병원 방문을 넣으세요."}</li>`;
+  $("#claimList").querySelectorAll(".info").forEach(b=>b.onclick=()=>editClaim(S.claims.find(c=>c.id===b.dataset.id)));
+  $("#claimList").querySelectorAll(".tg").forEach(b=>b.onclick=()=>{const c=S.claims.find(x=>x.id===b.dataset.id);const base={...c};delete base.id;save("claims",c.id,{...base,[b.dataset.f]:!c[b.dataset.f]})});
+}
+$("#claimFilter").querySelectorAll("button").forEach(b=>b.onclick=()=>{claimFilter=b.dataset.f;$("#claimFilter").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));renderClaims()});
+function editClaim(c){
+  openSheet({title:c?"실비 항목 수정":"실비 항목 추가",
+    fields:[{k:"hospital",l:"병원명",t:"text",full:1,list:hospitalList()},{k:"start",l:"시작일",t:"date"},{k:"end",l:"종료일",t:"date"},{k:"purpose",l:"치료 목적",t:"select",o:CLAIM_PURPOSES},{k:"note",l:"비고",t:"text",ph:"예: #5차 젬시임"},{k:"docs",l:"서류 받음",t:"check"},{k:"claimed",l:"실비 청구함",t:"check"}],
+    values:c||{start:ymd(new Date()),purpose:"항암"},
+    onSave:o=>{if(!o.hospital){toast("병원명을 넣어 주세요.");return false}const base=c?{...c}:{};delete base.id;return save("claims",c?.id,{...base,...o})},
+    onDelete:c?()=>remove("claims",c.id):null});
+}
+$("#addClaim").onclick=()=>editClaim(null);
+
+/* ---------- 이름 표시 ---------- */
+function fillNames(){document.querySelectorAll("[data-uid]").forEach(e=>{const n=e.dataset.uid;e.textContent=n&&!/^u_/.test(n)?"· "+n:""})}
+
+function renderAll(){renderCal();renderDay();renderLabs();renderClaims()}
+
+/* ---------- 연결 ---------- */
+renderAll();
+let loaded=0;
+const API=(p,o={})=>fetch("/api/"+p,{credentials:"same-origin",...o,headers:{"content-type":"application/json",...(o.headers||{})}});
+const COLLS=["schedules","days","entries","labs","claims"];
+const store={};COLLS.forEach(c=>store[c]=new Map());
+const listeners={};let ver=0,pullT=0;
+function emit(c){const docs=[...store[c]].map(([id,d])=>({id,exists:true,data:()=>d}));(listeners[c]||[]).forEach(f=>f({docs}))}
+async function errOf(r){if(r.status===401){showLogin();return {code:"permission_denied"}}let j={};try{j=await r.json()}catch(_){}return {code:j.error||"error"}}
+async function pull(){
+  let r;try{r=await API("sync?since="+ver)}catch(_){$("#sync").textContent="오프라인";return}
+  if(r.status===401){showLogin();return}
+  if(!r.ok){$("#sync").textContent="연결 오류";return}
+  const j=await r.json();const touched=new Set();
+  for(const d of j.docs){if(!store[d.coll])continue;touched.add(d.coll);if(d.del)store[d.coll].delete(d.id);else store[d.coll].set(d.id,d.data)}
+  ver=j.v;
+  if(!loaded){loaded=5;COLLS.forEach(emit);$("#notice").hidden=true}else touched.forEach(emit);
+  $("#sync").textContent="가족과 함께 저장 중";
+}
+function pullSoon(){clearTimeout(pullT);pullT=setTimeout(pull,400)}
+const shim={collection:c=>({
+  doc:id=>({
+    set:async data=>{const r=await API(`doc/${c}/${encodeURIComponent(id)}`,{method:"PUT",body:JSON.stringify(data)});if(!r.ok)throw await errOf(r);store[c].set(id,data);emit(c);pullSoon()},
+    delete:async()=>{const r=await API(`doc/${c}/${encodeURIComponent(id)}`,{method:"DELETE"});if(!r.ok)throw await errOf(r);store[c].delete(id);emit(c);pullSoon()}}),
+  add:async data=>{const r=await API(`doc/${c}`,{method:"POST",body:JSON.stringify(data)});if(!r.ok)throw await errOf(r);const j=await r.json();store[c].set(j.id,data);emit(c);pullSoon();return {id:j.id}},
+  onSnapshot:fn=>{(listeners[c]??=[]).push(fn)}
+})};
+/* 캡처 → 서버에서 Claude가 읽기 */
+function shrink(file){return new Promise((res,rej)=>{const img=new Image(),u=URL.createObjectURL(file);img.onload=()=>{const s=Math.min(1,1800/Math.max(img.width,img.height)),c=document.createElement("canvas");c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);c.getContext("2d").drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);res({type:"image/jpeg",data:c.toDataURL("image/jpeg",.85).split(",")[1]})};img.onerror=()=>rej({code:"image_rejected"});img.src=u})}
+sample={limits:async()=>({images:{maxCount:6}}),json:async(prompt,{images})=>{
+  const imgs=await Promise.all(images.map(shrink));
+  const r=await API("scan",{method:"POST",body:JSON.stringify({prompt,images:imgs})});
+  if(!r.ok)throw await errOf(r);
+  return (await r.json()).result}};
+/* 로그인 */
+function showLogin(){
+  const el=$("#login");if(!el.hidden)return;el.hidden=false;
+  try{$("#lgName").value=localStorage.getItem("mom-name")||""}catch(_){}
+  setTimeout(()=>$("#lgPw").focus(),50);
+}
+$("#lgForm").addEventListener("submit",async e=>{
+  e.preventDefault();const pw=$("#lgPw").value,nm=$("#lgName").value.trim();const msg=$("#lgMsg");
+  if(!nm){msg.textContent="기록하는 사람 이름을 적어 주세요.";return}
+  msg.textContent="확인 중…";
+  const r=await API("login",{method:"POST",body:JSON.stringify({pw})}).catch(()=>null);
+  if(!r){msg.textContent="인터넷 연결을 확인해 주세요.";return}
+  if(r.status===429){msg.textContent="너무 여러 번 틀렸어요. 10분 뒤에 다시 해 주세요.";return}
+  if(!r.ok){msg.textContent="비밀번호가 맞지 않아요.";return}
+  try{localStorage.setItem("mom-name",nm)}catch(_){}
+  myId=nm;$("#lgPw").value="";msg.textContent="";$("#login").hidden=true;pull();
+});
+/* 설정 */
+$("#setBtn").onclick=()=>{
+  const root=$("#sheetRoot");
+  root.innerHTML=`<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-label="설정">
+    <h2>설정</h2>
+    <div class="field"><label for="stName">기록하는 사람</label><input class="inp" id="stName" value="${esc(myId||"")}" placeholder="예: 딸, 아빠"></div>
+    <div class="acts" style="justify-content:flex-start"><button class="btn" id="stExport">백업 파일 받기</button><label class="btn" for="stImport" style="display:inline-flex;align-items:center;position:relative">백업 불러오기<input type="file" id="stImport" accept="application/json,.json" style="position:absolute;opacity:0;width:1px;height:1px"></label></div>
+    <p class="small muted" style="margin:0">백업 불러오기는 이미 있는 기록은 그대로 두고, 없는 기록만 채워요.</p>
+    <div class="acts"><button class="btn danger" id="stOut">로그아웃</button><span class="spacer"></span><button class="btn primary" id="stOk">닫기</button></div>
+  </div></div>`;
+  const close=()=>{root.innerHTML=""};
+  $("#scrim").addEventListener("click",e=>{if(e.target.id==="scrim")close()});
+  $("#stOk").onclick=()=>{const n=$("#stName").value.trim();if(n){myId=n;try{localStorage.setItem("mom-name",n)}catch(_){}}close()};
+  $("#stExport").onclick=async()=>{const r=await API("export");if(!r.ok){toast("백업을 받지 못했어요.");return}const b=new Blob([JSON.stringify(await r.json(),null,1)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="엄마항암수첩_백업_"+ymd(new Date())+".json";document.body.appendChild(a);a.click();a.remove()};
+  $("#stImport").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());const r=await API("import",{method:"POST",body:JSON.stringify(data)});if(!r.ok)throw 0;const j=await r.json();toast(`${j.n}개 기록을 확인했어요`);pull()}catch(_){toast("이 파일은 불러올 수 없어요.")}};
+  $("#stOut").onclick=async()=>{await API("logout",{method:"POST"});location.reload()};
+};
+(()=>{
+  try{myId=localStorage.getItem("mom-name")||null}catch(_){}
+  db=shim;
+  const sub=(coll,apply)=>db.collection(coll).onSnapshot(snap=>{apply(snap.docs.filter(x=>x.exists).map(x=>({id:x.id,...x.data()})));scheduleRender()});
+  sub("schedules",a=>S.schedules=a);
+  sub("days",a=>{S.days={};for(const x of a)S.days[x.id]=x});
+  sub("entries",a=>S.entries=a);
+  sub("labs",a=>S.labs=a);
+  sub("claims",a=>S.claims=a);
+  pull();
+  setInterval(()=>{if(document.visibilityState==="visible"&&$("#login").hidden)pull()},6000);
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")pull()});
+})();
+let rq=0;function scheduleRender(){cancelAnimationFrame(rq);rq=requestAnimationFrame(()=>{
+  // 입력 중인 값은 유지
+  const ae=document.activeElement; const keep=ae&&(ae.id==="memo"||ae.id==="wt")?{id:ae.id,v:ae.value}:null;
+  renderAll();
+  if(keep){const el=document.getElementById(keep.id);if(el){el.value=keep.v;el.focus()}}
+})}
+})();
+</script>
+
+</body></html>
