@@ -189,6 +189,28 @@ table.lab{border-collapse:separate;border-spacing:0;font-size:13.5px;min-width:1
 .chk{display:flex;gap:8px;align-items:center;font-size:14px}
 .chk input{width:18px;height:18px}
 .confirm{font-size:13.5px;color:var(--high)}
+/* 간병 */
+.cw{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 8px 8px}
+.cw-h{display:flex;justify-content:space-between;align-items:baseline;margin:0 4px 6px;font-weight:600;font-size:14px}
+.cg{display:grid;grid-template-columns:38px repeat(7,minmax(0,1fr));gap:2px}
+.cg .dh{border:0;background:none;padding:2px 0 4px;font-size:12px;font-weight:600;text-align:center;color:var(--ink);border-radius:6px}
+.cg .dh small{display:block;font-size:10px;color:var(--muted);font-weight:500}
+.cg .dh.sun{color:var(--high)} .cg .dh.sat{color:var(--low)}
+.cg .dh.out{opacity:.3;pointer-events:none}
+.cg .dh.today{background:var(--accent-soft)}
+.cg .tlb{font-size:10px;color:var(--muted);text-align:right;padding-right:3px;line-height:1.1;align-self:center;font-variant-numeric:tabular-nums}
+.cg .cs{height:30px;border:1px solid var(--line);border-radius:5px;background:var(--bg);font-size:10.5px;font-weight:600;padding:0;overflow:hidden;white-space:nowrap;text-overflow:clip;color:#1c2826;min-width:0}
+.cg .cs.out{opacity:.25;pointer-events:none}
+.cg .cs.on{border-color:transparent}
+.palette{position:sticky;bottom:0;z-index:4;background:var(--surface);border:1px solid var(--line);border-radius:var(--r) var(--r) 0 0;padding:10px 10px calc(10px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 16px rgba(0,0,0,.08);display:flex;flex-direction:column;gap:8px}
+.pal-row{display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:2px;scrollbar-width:thin}
+.pc{flex:none;scroll-snap-align:start;border:2px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px}
+.pc i{width:14px;height:14px;border-radius:50%;background:var(--c)}
+.pc[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.pal-h{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.hours{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13px}
+.hours span{display:inline-flex;align-items:center;gap:5px}
+.hours i{width:10px;height:10px;border-radius:50%;background:var(--c)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--surface);padding:9px 16px;border-radius:999px;font-size:13.5px;z-index:30;max-width:90%}
 @media (prefers-reduced-motion:no-preference){.sheet{animation:up .18s ease-out}@keyframes up{from{transform:translateY(16px);opacity:.6}}}
 </style>
@@ -200,6 +222,7 @@ table.lab{border-collapse:separate;border-spacing:0;font-size:13.5px;min-width:1
       <button class="tab" role="tab" id="tab-cal" data-v="cal" aria-selected="true">기록·일정</button>
       <button class="tab" role="tab" id="tab-lab" data-v="lab" aria-selected="false">피검사</button>
       <button class="tab" role="tab" id="tab-claim" data-v="claim" aria-selected="false">실비 서류</button>
+      <button class="tab" role="tab" id="tab-care" data-v="care" aria-selected="false">간병</button>
     </nav>
   </div>
 </header>
@@ -253,6 +276,22 @@ table.lab{border-collapse:separate;border-spacing:0;font-size:13.5px;min-width:1
       <button class="btn primary" id="addClaim">+ 추가</button>
     </div>
     <ul class="claims" id="claimList"></ul>
+  </section>
+  <!-- 간병 -->
+  <section id="v-care" hidden style="flex-direction:column;gap:12px">
+    <div class="card" style="padding:10px 14px">
+      <div class="cal-nav" style="margin:0">
+        <button class="iconbtn" id="cPrev" aria-label="이전 달">‹</button>
+        <span class="m" id="cLabel"></span>
+        <button class="iconbtn" id="cNext" aria-label="다음 달">›</button>
+      </div>
+      <div class="hours" id="cHours" style="margin-top:8px"></div>
+    </div>
+    <div id="cWeeks" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div class="palette">
+      <div class="pal-h"><span id="palHint">사람을 고르고 칸을 누르면 배치돼요</span><span style="display:flex;gap:6px"><button class="btn" id="cTimes" style="padding:4px 10px;font-size:12.5px;white-space:nowrap">시간 조정</button><button class="btn" id="cPeople" style="padding:4px 10px;font-size:12.5px;white-space:nowrap">사람 관리</button></span></div>
+      <div class="pal-row" id="cPal"></div>
+    </div>
   </section>
 </div></main>
 
@@ -344,7 +383,7 @@ function flagOf(k,v,ref){
 const showVal=(c,k)=>{const v=c.values?.[k];if(v==null)return"";return (c.quals?.[k]||"")+v}
 
 /* ---------- 상태 ---------- */
-const S={schedules:[],days:{},entries:[],labs:[],claims:[]};
+const S={schedules:[],days:{},entries:[],labs:[],claims:[],care:{}};
 let db=null, user=null, myId=null, canWrite=true;
 let selDate=ymd(new Date()); let viewY=new Date().getFullYear(), viewM=new Date().getMonth();
 let chartKey=null, claimFilter="all";
@@ -353,11 +392,11 @@ const names={};
 /* ---------- 탭 ---------- */
 function showView(v){
   document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.v===v)));
-  for(const id of ["cal","lab","claim"]){const el=$("#v-"+id);el.hidden=id!==v;if(id===v)el.style.display="flex"}
+  for(const id of ["cal","lab","claim","care"]){const el=$("#v-"+id);el.hidden=id!==v;if(id===v)el.style.display="flex"}
   try{localStorage.setItem("tab",v)}catch(e){}
 }
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>showView(b.dataset.v));
-try{const t=localStorage.getItem("tab");if(t&&["cal","lab","claim"].includes(t))showView(t)}catch(e){}
+try{const t=localStorage.getItem("tab");if(t&&["cal","lab","claim","care"].includes(t))showView(t)}catch(e){}
 
 /* ---------- 쓰기 ---------- */
 function guard(){ if(!db){toast("저장할 수 없어요. 새로고침해 주세요.");return false} if(!myId){showLogin();return false} if(!canWrite){toast("보기 전용 권한이라 저장할 수 없어요.");return false} return true }
@@ -733,13 +772,92 @@ $("#addClaim").onclick=()=>editClaim(null);
 /* ---------- 이름 표시 ---------- */
 function fillNames(){document.querySelectorAll("[data-uid]").forEach(e=>{const n=e.dataset.uid;e.textContent=n&&!/^u_/.test(n)?"· "+n:""})}
 
-function renderAll(){renderCal();renderDay();renderLabs();renderClaims()}
+/* ---------- 간병 ---------- */
+const CARE_COLORS=["#F6C9A8","#BFD8F2","#CDE7C4","#E8C8EC","#F7E3A1","#F4B9C3","#C9E6E4","#D9D2F3"];
+const DEF_TIMES=["00:00","04:00","08:00","12:00","16:00","20:00"];
+let cY=new Date().getFullYear(),cM=new Date().getMonth(),cPick=null;
+const careCfg=()=>{const c=S.care._cfg||{};return {people:Array.isArray(c.people)?c.people:[],times:Array.isArray(c.times)&&c.times.length===6?c.times:DEF_TIMES}};
+const personOf=n=>careCfg().people.find(p=>p.n===n);
+const slotHours=times=>times.map((t,i)=>{const a=+t.slice(0,2)*60+ +t.slice(3,5),nx=times[(i+1)%6],b=+nx.slice(0,2)*60+ +nx.slice(3,5);return ((b-a+1440)%1440||1440)/60});
+function renderCare(){
+  const cfg=careCfg(),hrs=slotHours(cfg.times);
+  $("#cLabel").textContent=cY+"년 "+(cM+1)+"월";
+  const first=new Date(cY,cM,1),start=new Date(first);start.setDate(1-first.getDay());
+  const today=ymd(new Date());const tot={};
+  let h="";
+  for(let w=0;w<6;w++){
+    const ws=new Date(start);ws.setDate(start.getDate()+w*7);
+    if(w>0&&ws.getMonth()!==cM)break;
+    const days=[...Array(7)].map((_,i)=>{const d=new Date(ws);d.setDate(ws.getDate()+i);return d});
+    let g=`<div class="cg"><span></span>${days.map((d,i)=>{const s=ymd(d),out=d.getMonth()!==cM;return `<button class="dh ${i===0?"sun":i===6?"sat":""} ${out?"out":""} ${s===today?"today":""}" data-day="${s}">${d.getDate()}<small>${DOW[i]}</small></button>`}).join("")}`;
+    for(let k=0;k<6;k++){
+      g+=`<span class="tlb">${cfg.times[k]}</span>`;
+      for(const d of days){const s=ymd(d),out=d.getMonth()!==cM,n=(S.care[s]?.slots||[])[k]||null,p=n&&personOf(n);
+        if(n&&!out)tot[n]=(tot[n]||0)+hrs[k];
+        g+=`<button class="cs ${out?"out":""} ${n?"on":""}" data-d="${s}" data-k="${k}" style="${n?`background:${p?p.c:"#ddd"}`:""}" aria-label="${fmtDay(s)} ${cfg.times[k]} ${n?esc(n):"비어 있음"}">${n?esc(n.slice(0,3)):""}</button>`}
+    }
+    g+=`</div>`;
+    h+=`<div class="cw"><div class="cw-h"><span>${w+1}주차</span><span class="small muted">${days[0].getMonth()+1}/${days[0].getDate()} ~ ${days[6].getMonth()+1}/${days[6].getDate()}</span></div>${g}</div>`;
+  }
+  $("#cWeeks").innerHTML=h;
+  $("#cHours").innerHTML=Object.keys(tot).length?Object.entries(tot).sort((a,b)=>b[1]-a[1]).map(([n,v])=>`<span><i style="--c:${personOf(n)?.c||"#ddd"}"></i>${esc(n)} <b>${Math.round(v*10)/10}시간</b></span>`).join(""):`<span class="muted">이번 달 배치된 간병이 아직 없어요.</span>`;
+  $("#cPal").innerHTML=cfg.people.map(p=>`<button class="pc" style="--c:${p.c}" data-n="${esc(p.n)}" aria-pressed="${cPick===p.n}"><i></i>${esc(p.n)}</button>`).join("")+`<button class="pc" data-n="" aria-pressed="${cPick===""}" style="--c:var(--bg)"><i style="border:1px dashed var(--muted)"></i>지우개</button>`+(cfg.people.length?"":`<button class="pc" id="palAdd">+ 간병할 사람 추가</button>`);
+  $("#palHint").textContent=cPick===null?"아래에서 사람을 고르고 칸을 누르세요":cPick===""?"지우개: 칸을 누르면 비워져요 · 날짜를 누르면 하루 전체":`${cPick} · 칸 누르면 배치, 날짜 누르면 하루 전체`;
+}
+const careSaveT={},careLocal={}; // 아직 서버에 안 간 칸은 화면에 계속 보이게
+function setSlots(d,fn){
+  if(!guard())return;
+  const cur=(S.care[d]?.slots||[null,null,null,null,null,null]).slice();while(cur.length<6)cur.push(null);
+  fn(cur);const doc={date:d,slots:cur};careLocal[d]=doc;S.care[d]=doc;renderCare();
+  clearTimeout(careSaveT[d]);careSaveT[d]=setTimeout(async()=>{const mine=careLocal[d];if(await save("care",d,mine)&&careLocal[d]===mine)delete careLocal[d]},500);
+}
+$("#cWeeks").addEventListener("click",e=>{
+  const c=e.target.closest(".cs"),dh=e.target.closest(".dh");
+  if(cPick===null){if(c||dh)toast("아래에서 간병할 사람을 먼저 골라 주세요.");return}
+  const v=cPick||null;
+  if(c)setSlots(c.dataset.d,a=>{const k=+c.dataset.k;a[k]=a[k]===v?null:v});
+  else if(dh)setSlots(dh.dataset.day,a=>{for(let k=0;k<6;k++)a[k]=v});
+});
+$("#cPal").addEventListener("click",e=>{const b=e.target.closest(".pc");if(!b)return;if(b.id==="palAdd"){$("#cPeople").click();return}cPick=cPick===b.dataset.n?null:b.dataset.n;renderCare()});
+$("#cPrev").onclick=()=>{cM--;if(cM<0){cM=11;cY--}renderCare()};
+$("#cNext").onclick=()=>{cM++;if(cM>11){cM=0;cY++}renderCare()};
+function saveCfg(patch){const c={...careCfg(),...patch};careLocal._cfg=c;S.care._cfg=c;renderCare();return save("care","_cfg",c).then(ok=>{if(ok&&careLocal._cfg===c)delete careLocal._cfg;return ok})}
+$("#cPeople").onclick=()=>{
+  const draw=()=>{const cfg=careCfg();root.innerHTML=`<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-label="간병하는 사람">
+    <h2>간병하는 사람</h2>
+    <div style="display:flex;flex-direction:column;gap:6px">${cfg.people.map((p,i)=>`<div style="display:flex;align-items:center;gap:8px"><input type="color" value="${p.c}" data-i="${i}" class="pcol" aria-label="${esc(p.n)} 색" style="width:36px;height:32px;border:0;background:none;padding:0"><span style="flex:1;font-weight:600">${esc(p.n)}</span><button class="btn danger" data-del="${i}" style="padding:4px 10px">빼기</button></div>`).join("")||'<p class="small muted" style="margin:0">아직 없어요. 아래에서 추가하세요.</p>'}</div>
+    <div style="display:flex;gap:8px"><input class="inp" id="pNew" placeholder="예: 큰딸, 아빠, 간병인 이모" maxlength="10"><button class="btn primary" id="pAdd">추가</button></div>
+    <p class="small muted" style="margin:0">빼도 이미 배치된 칸은 그대로 남아요.</p>
+    <div class="acts"><span class="spacer"></span><button class="btn" id="pClose">닫기</button></div></div></div>`;
+    $("#scrim").addEventListener("click",e=>{if(e.target.id==="scrim")root.innerHTML=""});
+    $("#pClose").onclick=()=>root.innerHTML="";
+    $("#pAdd").onclick=()=>{const n=$("#pNew").value.trim();if(!n)return;const c=careCfg();if(c.people.some(p=>p.n===n)){toast("이미 있는 이름이에요.");return}saveCfg({people:[...c.people,{n,c:CARE_COLORS[c.people.length%CARE_COLORS.length]}]});draw()};
+    root.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{const c=careCfg();const ps=c.people.filter((_,i)=>i!==+b.dataset.del);if(cPick&&!ps.some(p=>p.n===cPick))cPick=null;saveCfg({people:ps});draw()});
+    root.querySelectorAll(".pcol").forEach(inp=>inp.onchange=()=>{const c=careCfg();const ps=c.people.map((p,i)=>i===+inp.dataset.i?{...p,c:inp.value}:p);saveCfg({people:ps})});
+  };
+  const root=$("#sheetRoot");if(!guard())return;draw();
+};
+$("#cTimes").onclick=()=>{
+  if(!guard())return;const cfg=careCfg(),root=$("#sheetRoot");
+  root.innerHTML=`<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-label="시간 조정">
+    <h2>하루 6칸 시간 조정</h2><p class="small muted" style="margin:0">각 칸이 시작하는 시간이에요. 다음 칸 시작 전까지가 한 칸이에요.</p>
+    <div class="fields">${cfg.times.map((t,i)=>`<div class="field"><label for="ct${i}">${i+1}번째 칸</label><input class="inp" type="time" id="ct${i}" value="${t}" step="1800"></div>`).join("")}</div>
+    <div class="acts"><button class="btn" id="ctReset">기본값(4시간씩)</button><span class="spacer"></span><button class="btn" id="ctCancel">취소</button><button class="btn primary" id="ctSave">저장</button></div></div></div>`;
+  const close=()=>root.innerHTML="";
+  $("#scrim").addEventListener("click",e=>{if(e.target.id==="scrim")close()});$("#ctCancel").onclick=close;
+  $("#ctReset").onclick=()=>DEF_TIMES.forEach((t,i)=>$("#ct"+i).value=t);
+  $("#ctSave").onclick=()=>{const ts=[0,1,2,3,4,5].map(i=>$("#ct"+i).value);if(ts.some(t=>!t)){toast("시간을 모두 넣어 주세요.");return}
+    for(let i=1;i<6;i++)if(ts[i]<=ts[i-1]){toast("시간이 순서대로 늘어나야 해요.");return}
+    saveCfg({times:ts});close()};
+};
+
+function renderAll(){renderCal();renderDay();renderLabs();renderClaims();renderCare()}
 
 /* ---------- 연결 ---------- */
 renderAll();
 let loaded=0;
 const API=(p,o={})=>fetch("/api/"+p,{credentials:"same-origin",...o,headers:{"content-type":"application/json",...(o.headers||{})}});
-const COLLS=["schedules","days","entries","labs","claims"];
+const COLLS=["schedules","days","entries","labs","claims","care"];
 const store={};COLLS.forEach(c=>store[c]=new Map());
 const listeners={};let ver=0,pullT=0;
 function emit(c){const docs=[...store[c]].map(([id,d])=>({id,exists:true,data:()=>d}));(listeners[c]||[]).forEach(f=>f({docs}))}
@@ -812,6 +930,7 @@ $("#setBtn").onclick=()=>{
   sub("entries",a=>S.entries=a);
   sub("labs",a=>S.labs=a);
   sub("claims",a=>S.claims=a);
+  sub("care",a=>{S.care={};for(const x of a)S.care[x.id]=x;for(const d in careLocal)S.care[d]=careLocal[d]});
   pull();
   setInterval(()=>{if(document.visibilityState==="visible"&&$("#login").hidden)pull()},6000);
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")pull()});

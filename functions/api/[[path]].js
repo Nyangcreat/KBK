@@ -1,6 +1,6 @@
 // 엄마 항암 수첩 — Cloudflare Pages Functions API
 // Bindings (Pages → Settings): D1 database "DB", secrets FAMILY_PASSWORD, ANTHROPIC_API_KEY
-const COLLS = new Set(["schedules", "days", "entries", "labs", "claims"]);
+const COLLS = new Set(["schedules", "days", "entries", "labs", "claims", "care"]);
 const ID_RE = /^[A-Za-z0-9_\-.:]{1,80}$/;
 const COOKIE = "momnote";
 const MODEL = "claude-sonnet-5-5";
