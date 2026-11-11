@@ -1,5 +1,6 @@
 // 엄마 항암 수첩 — Cloudflare Pages Functions API
 // Bindings (Pages → Settings): D1 database "DB", secrets FAMILY_PASSWORD, ANTHROPIC_API_KEY
+import SEED from "../../lib/seed.js";
 const COLLS = new Set(["schedules", "days", "entries", "labs", "claims", "care"]);
 const ID_RE = /^[A-Za-z0-9_\-.:]{1,80}$/;
 const COOKIE = "momnote";
@@ -27,6 +28,14 @@ async function init(db) {
     db.prepare("CREATE INDEX IF NOT EXISTS docs_v ON docs (v)"),
     db.prepare("CREATE TABLE IF NOT EXISTS lim (k TEXT PRIMARY KEY, n INTEGER NOT NULL, t INTEGER NOT NULL)"),
   ]);
+  const seeded = await db.prepare("SELECT n FROM lim WHERE k='seeded'").first();
+  if (!seeded) { // first run: bring over the records from the old notebook, once
+    const stmts = [];
+    for (const [coll, docs] of Object.entries(SEED)) for (const [id, data] of Object.entries(docs))
+      stmts.push(db.prepare("INSERT OR IGNORE INTO docs (coll,id,data,v,del) VALUES (?,?,?,?,0)").bind(coll, id, JSON.stringify(data), nextV()));
+    stmts.push(db.prepare("INSERT OR REPLACE INTO lim (k,n,t) VALUES ('seeded',1,?)").bind(Date.now()));
+    for (let i = 0; i < stmts.length; i += 50) await db.batch(stmts.slice(i, i + 50));
+  }
   ready = true;
 }
 async function bump(db, key, max, windowMs) { // returns true when over the limit
