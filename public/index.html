@@ -198,8 +198,9 @@ table.lab{border-collapse:separate;border-spacing:0;font-size:13.5px;min-width:1
 .pc{flex:none;border:0;background:var(--c);color:#1c2826;border-radius:999px;padding:7px 12px;font-size:14px;font-weight:600;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;box-shadow:0 1px 3px rgba(0,0,0,.15)}
 .pc.add{background:var(--surface);border:1.5px dashed var(--accent);color:var(--accent);box-shadow:none;cursor:pointer;touch-action:auto}
 .drag-ghost{position:fixed;z-index:60;pointer-events:none;transform:translate(-50%,-120%);opacity:.92}
-.wscroll{border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden}
-.wg{display:grid;grid-template-columns:repeat(42,minmax(0,1fr));grid-template-rows:auto 8px 72px;position:relative}
+.wscroll{border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none}
+.wscroll::-webkit-scrollbar{display:none}
+.wg{display:grid;grid-template-rows:auto 8px 72px;position:relative;width:max-content}
 .wg .dh{grid-row:1;grid-column:span 6;text-align:center;font-size:12px;font-weight:600;padding:5px 0 3px;border-left:2px solid var(--line);color:var(--ink);line-height:1.2;min-width:0}
 .wg .dh small{display:block;font-size:10px;color:var(--muted);font-weight:500}
 .wg .dh.sun{color:var(--high)} .wg .dh.sat{color:var(--low)} .wg .dh.today{background:var(--accent-soft)}
@@ -207,10 +208,11 @@ table.lab{border-collapse:separate;border-spacing:0;font-size:13.5px;min-width:1
 .wg .tk.d0,.wg .cell.d0{border-left:2px solid var(--line)}
 .wg .cell{grid-row:3;border-left:1px dashed var(--line);border-top:1px solid var(--line);background:var(--bg)}
 .wg .cell.hot{background:var(--accent-soft)}
-.blk{grid-row:3;position:relative;z-index:2;align-self:center;height:56px;border-radius:7px;background:var(--c);color:#1c2826;font-size:11.5px;font-weight:700;padding:4px 12px 4px 12px;min-width:0;text-align:left;overflow:hidden;white-space:nowrap;line-height:1.25;border:0;margin:0 1px;box-shadow:0 1px 3px rgba(0,0,0,.18)}
-.blk .hd.l{right:auto;left:0}
-.blk .hd{position:absolute;top:0;bottom:0;right:0;width:12px;touch-action:none;cursor:ew-resize;display:grid;place-items:center}
+.blk{grid-row:3;position:relative;z-index:2;align-self:center;height:56px;border-radius:7px;background:var(--c);color:#1c2826;font-size:11.5px;font-weight:700;padding:4px 5px;min-width:0;text-align:left;overflow:visible;white-space:nowrap;line-height:1.25;border:0;margin:0 1px;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.blk .hd.l{right:auto;left:-8px}
+.blk .hd{position:absolute;top:0;bottom:0;right:-8px;width:18px;z-index:3;touch-action:none;cursor:ew-resize;display:grid;place-items:center}
 .blk .hd::after{content:"";width:3px;height:18px;border-radius:2px;background:rgba(0,0,0,.35)}
+.blk .nm{display:block;overflow:hidden;text-overflow:clip}
 .blk .tm{display:block;font-size:10px;font-weight:500;opacity:.8}
 .hours{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13px}
 .hours span{display:inline-flex;align-items:center;gap:5px}
@@ -776,33 +778,58 @@ function fillNames(){document.querySelectorAll("[data-uid]").forEach(e=>{const n
 const CARE_COLORS=["#F6C9A8","#BFD8F2","#CDE7C4","#E8C8EC","#F7E3A1","#F4B9C3","#C9E6E4","#D9D2F3"];
 const DEF_TIMES=["00:00","04:00","08:00","12:00","16:00","20:00"];
 const sunday=d=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-x.getDay());return x};
-let cWeek=sunday(new Date()),cScrolled=null;
+const RW=9; // 한 번에 그려 두는 주 수 (가운데 주를 중심으로 앞뒤 4주)
+let cBase=sunday(new Date());cBase.setDate(cBase.getDate()-28); // 그려 둔 첫 일요일
+let cView=sunday(new Date()),cW=8,cBuilt=false,cHold=0;
 const careCfg=()=>{const c=S.care._cfg||{};return {people:Array.isArray(c.people)?c.people:[],times:Array.isArray(c.times)&&c.times.length===6?c.times:DEF_TIMES}};
 const personOf=n=>careCfg().people.find(p=>p.n===n);
 const slotHours=times=>times.map((t,i)=>{const a=+t.slice(0,2)*60+ +t.slice(3,5),nx=times[(i+1)%6],b=+nx.slice(0,2)*60+ +nx.slice(3,5);return ((b-a+1440)%1440||1440)/60});
 const hm=t=>{const h=+t.slice(0,2),m=t.slice(3,5);return m==="00"?h+"시":h+":"+m};
 const slotsOf=d=>{const a=(S.care[d]?.slots||[]).slice(0,6);while(a.length<6)a.push(null);return a};
-const weekDays=()=>[...Array(7)].map((_,i)=>{const d=new Date(cWeek);d.setDate(cWeek.getDate()+i);return ymd(d)});
-const weekSlots=()=>weekDays().flatMap(slotsOf);
+const rangeDays=()=>[...Array(RW*7)].map((_,i)=>{const d=new Date(cBase);d.setDate(cBase.getDate()+i);return ymd(d)});
+const rangeSlots=()=>rangeDays().flatMap(slotsOf);
+const NS=RW*42;
 function weekLabel(ws){const mid=new Date(ws);mid.setDate(ws.getDate()+3);const m=mid.getMonth();const firstMid=sunday(new Date(mid.getFullYear(),m,1));firstMid.setDate(firstMid.getDate()+3);if(firstMid.getMonth()!==m)firstMid.setDate(firstMid.getDate()+7);return {m,y:mid.getFullYear(),wk:Math.round((mid-firstMid)/(7*864e5))+1}}
-function renderCare(){
-  const cfg=careCfg(),hrs=slotHours(cfg.times),L=weekLabel(cWeek),days=weekDays(),W=weekSlots(),today=ymd(new Date());
+const dayIdx=d=>Math.round((d-cBase)/864e5);
+function updLabel(){
+  const cfg=careCfg(),hrs=slotHours(cfg.times),L=weekLabel(cView);
   $("#cLabel").textContent=`${L.m+1}월 ${L.wk}wk`;
-  $("#cPal").innerHTML=cfg.people.map(p=>`<button class="pc" style="--c:${p.c}" data-n="${esc(p.n)}">${esc(p.n)}</button>`).join("")+`<button class="pc add" id="palAdd" aria-label="간병할 사람 추가">＋</button>`;
-  $("#palHint").textContent=cfg.people.length?`하루 6칸(${cfg.times.map(t=>+t.slice(0,2)).join("·")}시). 이름을 끌어다 놓고 막대 오른쪽 끝을 옆으로 끌어 늘려요. 막대를 누르면 시간 확인·지우기.`:"오른쪽 위 ＋를 눌러 간병할 사람을 먼저 추가하세요.";
-  let h=days.map((s,i)=>{const d=parseYmd(s);return `<div class="dh ${i===0?"sun":i===6?"sat":""} ${s===today?"today":""}" style="grid-column:${i*6+1}/span 6">${d.getMonth()+1}/${d.getDate()}<small>${DOW[i]}</small></div>`}).join("");
-  for(let g=0;g<42;g++){const k=g%6;h+=`<span class="tk ${k?"":"d0"}" style="grid-column:${g+1}"></span><div class="cell ${k?"":"d0"}" data-g="${g}" style="grid-column:${g+1}"></div>`}
-  let g=0;while(g<42){const n=W[g];if(!n){g++;continue}let e=g;while(e+1<42&&W[e+1]===n)e++;const p=personOf(n);
-    h+=`<button class="blk" data-s="${g}" data-e="${e}" style="grid-column:${g+1}/${e+2};--c:${p?p.c:"#ddd"}">${esc(n)}${e-g>=5?`<span class="tm">${hm(cfg.times[g%6])}~${hm(cfg.times[(e+1)%6])}</span>`:""}<span class="hd l" aria-label="시작 시간 조절"></span><span class="hd" aria-label="끝 시간 조절"></span></button>`;g=e+1}
-  $("#cGrid").innerHTML=h;
-    const tot={};const first=new Date(L.y,L.m,1),last=new Date(L.y,L.m+1,0);
+  const tot={};const first=new Date(L.y,L.m,1),last=new Date(L.y,L.m+1,0);
   for(let d=new Date(first);d<=last;d.setDate(d.getDate()+1)){slotsOf(ymd(d)).forEach((n,k)=>{if(n)tot[n]=(tot[n]||0)+hrs[k]})}
   $("#cMonthH").textContent=`${L.m+1}월 간병 시간`;
   $("#cHours").innerHTML=Object.keys(tot).length?Object.entries(tot).sort((a,b)=>b[1]-a[1]).map(([n,v])=>`<span><i style="--c:${personOf(n)?.c||"#ddd"}"></i>${esc(n)} <b>${Math.round(v*10)/10}시간</b></span>`).join(""):`<span class="muted">이 달에 배치된 간병이 아직 없어요.</span>`;
 }
+function renderCare(){
+  const cfg=careCfg(),days=rangeDays(),W=rangeSlots(),today=ymd(new Date()),sc=$("#cScroll");
+  const keep=cBuilt?sc.scrollLeft:null;
+  cW=Math.max(6,(sc.clientWidth||330)/42);
+  $("#cPal").innerHTML=cfg.people.map(p=>`<button class="pc" style="--c:${p.c}" data-n="${esc(p.n)}">${esc(p.n)}</button>`).join("")+`<button class="pc add" id="palAdd" aria-label="간병할 사람 추가">＋</button>`;
+  $("#palHint").textContent=cfg.people.length?`하루 6칸(${cfg.times.map(t=>+t.slice(0,2)).join("·")}시). 옆으로 밀어 다음 주로 넘어가요. 이름을 끌어다 놓고 막대 양 끝을 끌어 시간을 조절해요.`:"오른쪽 위 ＋를 눌러 간병할 사람을 먼저 추가하세요.";
+  let h=days.map((s,i)=>{const d=parseYmd(s),w=d.getDay();return `<div class="dh ${w===0?"sun":w===6?"sat":""} ${s===today?"today":""}" style="grid-column:${i*6+1}/span 6">${d.getMonth()+1}/${d.getDate()}<small>${DOW[w]}</small></div>`}).join("");
+  for(let g=0;g<NS;g++){const k=g%6;h+=`<span class="tk ${k?"":"d0"}" style="grid-column:${g+1}"></span><div class="cell ${k?"":"d0"}" data-g="${g}" style="grid-column:${g+1}"></div>`}
+  let g=0;while(g<NS){const n=W[g];if(!n){g++;continue}let e=g;while(e+1<NS&&W[e+1]===n)e++;const p=personOf(n);
+    h+=`<button class="blk" data-s="${g}" data-e="${e}" style="grid-column:${g+1}/${e+2};--c:${p?p.c:"#ddd"}"><span class="nm">${esc(n)}${e-g>=5?`<span class="tm">${hm(cfg.times[g%6])}~${hm(cfg.times[(e+1)%6])}</span>`:""}</span>${e>g?`<span class="hd l" aria-label="시작 시간 조절"></span>`:""}<span class="hd" aria-label="끝 시간 조절"></span></button>`;g=e+1}
+  const grid=$("#cGrid");grid.style.gridTemplateColumns=`repeat(${NS},${cW}px)`;grid.innerHTML=h;
+  if(keep==null||!cBuilt){sc.scrollLeft=dayIdx(cView)*6*cW;cBuilt=true}else sc.scrollLeft=keep;
+  updLabel();
+}
+function jumpTo(ws,smooth){ // ws: 보여 줄 주의 일요일
+  cView=sunday(ws);cHold=Date.now()+700;const di=dayIdx(cView);
+  if(di<7||di>(RW-2)*7){cBase=new Date(cView);cBase.setDate(cBase.getDate()-28);cBuilt=false;renderCare();return}
+  $("#cScroll").scrollTo({left:di*6*cW,behavior:smooth?"smooth":"auto"});updLabel();
+}
+let scT=0;
+$("#cScroll").addEventListener("scroll",()=>{
+  const sc=$("#cScroll");const di=Math.round(sc.scrollLeft/(6*cW));const d=new Date(cBase);d.setDate(cBase.getDate()+di);
+  const ws=sunday(new Date(d.getFullYear(),d.getMonth(),d.getDate()+3)); // 화면 가운데쯤이 속한 주
+  if(Date.now()>cHold&&+ws!==+cView){cView=ws;updLabel()}
+  clearTimeout(scT);scT=setTimeout(()=>{if(Date.now()<cHold)return;const i=Math.round(sc.scrollLeft/(6*cW));if(i<7||i>(RW-2)*7){const first=new Date(cBase);first.setDate(cBase.getDate()+i);cBase=sunday(first);cBase.setDate(cBase.getDate()-28);const off=Math.round((first-cBase)/864e5);cBuilt=true;renderCare();sc.scrollLeft=off*6*cW}},250);
+},{passive:true});
+window.addEventListener("resize",()=>{if(!$("#v-care").hidden){cBuilt=false;renderCare()}});
+document.getElementById("tab-care").addEventListener("click",()=>{cBuilt=false;requestAnimationFrame(renderCare)});
 const careSaveT={},careLocal={}; // 아직 서버에 안 간 칸은 화면에 계속 보이게
-function putWeek(W,saveIt){ // W: 42 slots for the shown week
-  const days=weekDays();days.forEach((d,i)=>{const cur=slotsOf(d),nx=W.slice(i*6,i*6+6);if(cur.every((v,k)=>v===nx[k])&&!careLocal[d])return;
+function putRange(W,saveIt){
+  rangeDays().forEach((d,i)=>{const cur=slotsOf(d),nx=W.slice(i*6,i*6+6);if(cur.every((v,k)=>v===nx[k])&&!careLocal[d])return;
     const doc={date:d,slots:nx};careLocal[d]=doc;S.care[d]=doc;
     if(saveIt){clearTimeout(careSaveT[d]);careSaveT[d]=setTimeout(async()=>{const mine=careLocal[d];if(await save("care",d,mine)&&careLocal[d]===mine)delete careLocal[d]},400)}});
   renderCare();
@@ -815,34 +842,35 @@ $("#cPal").addEventListener("pointerdown",e=>{
   let hot=null;const mv=ev=>{gh.style.left=ev.clientX+"px";gh.style.top=ev.clientY+"px";const cc=cellAt(ev.clientX,ev.clientY);if(hot!==cc){hot&&hot.classList.remove("hot");hot=cc;hot&&hot.classList.add("hot")}};
   mv(e);
   const up=ev=>{document.removeEventListener("pointermove",mv);document.removeEventListener("pointerup",up);document.removeEventListener("pointercancel",up);gh.remove();hot&&hot.classList.remove("hot");
-    if(ev.type==="pointerup"&&hot){const W=weekSlots();W[+hot.dataset.g]=n;putWeek(W,true)}
+    if(ev.type==="pointerup"&&hot){const W=rangeSlots();W[+hot.dataset.g]=n;putRange(W,true)}
     else if(ev.type==="pointerup")toast("시간표 칸 위에 놓아 주세요.")};
   document.addEventListener("pointermove",mv);document.addEventListener("pointerup",up);document.addEventListener("pointercancel",up);
 });
 $("#cPal").addEventListener("click",e=>{if(e.target.closest("#palAdd"))openPeople()});
-/* 오른쪽 손잡이로 옆으로 늘리기·줄이기 (다음 날로 넘어가도 돼요) */
+/* 막대 양 끝으로 시간 조절 (주를 넘어가도 이어져요) */
 $("#cGrid").addEventListener("pointerdown",e=>{
   const hd=e.target.closest(".hd");if(!hd)return;e.preventDefault();e.stopPropagation();if(!guard())return;
-  const blk=hd.closest(".blk"),s0=+blk.dataset.s,e0=+blk.dataset.e,base=weekSlots(),n=base[s0],left=hd.classList.contains("l");let st=s0,end=e0;
-  let lastX=e.clientX;
-  const apply=()=>{const cells=[...document.querySelectorAll("#cGrid .cell")];let k=left?41:0;
-    for(const c of cells){const r=c.getBoundingClientRect(),g=+c.dataset.g;if(left){if(lastX<r.right-r.width*.4){k=g;break}}else if(lastX>=r.left+r.width*.4)k=g}
-    k=left?Math.min(k,e0):Math.max(s0,k);
-    const ns=left?k:s0,ne=left?e0:k;if(ns!==st||ne!==end){st=ns;end=ne;const W=base.slice();for(let i=s0;i<=e0;i++)W[i]=null;for(let i=st;i<=end;i++)W[i]=n;putWeek(W,false)}};
-  const mv=ev=>{lastX=ev.clientX;apply()};
-  const up=()=>{document.removeEventListener("pointermove",mv);document.removeEventListener("pointerup",up);document.removeEventListener("pointercancel",up);putWeek(weekSlots(),true)};
+  const blk=hd.closest(".blk"),s0=+blk.dataset.s,e0=+blk.dataset.e,base=rangeSlots(),n=base[s0],left=hd.classList.contains("l");let st=s0,end=e0;
+  const sc=$("#cScroll");let lastX=e.clientX,raf=0;
+  const apply=()=>{const r0=$("#cGrid").getBoundingClientRect();const g=Math.floor((lastX-r0.left)/cW+(left?0:-.4)+(left?.4:0));
+    let k=Math.max(0,Math.min(NS-1,g));k=left?Math.min(k,e0):Math.max(s0,k);
+    const ns=left?k:s0,ne=left?e0:k;if(ns!==st||ne!==end){st=ns;end=ne;const W=base.slice();for(let i=s0;i<=e0;i++)W[i]=null;for(let i=st;i<=end;i++)W[i]=n;putRange(W,false)}};
+  const edge=()=>{const r=sc.getBoundingClientRect();if(lastX>r.right-20)sc.scrollLeft+=6;else if(lastX<r.left+20)sc.scrollLeft-=6;apply();raf=requestAnimationFrame(edge)};raf=requestAnimationFrame(edge);
+  const mv=ev=>{lastX=ev.clientX};
+  const up=()=>{cancelAnimationFrame(raf);document.removeEventListener("pointermove",mv);document.removeEventListener("pointerup",up);document.removeEventListener("pointercancel",up);putRange(rangeSlots(),true)};
   document.addEventListener("pointermove",mv);document.addEventListener("pointerup",up);document.addEventListener("pointercancel",up);
 });
 $("#cGrid").addEventListener("click",e=>{
   const blk=e.target.closest(".blk");if(!blk||e.target.closest(".hd"))return;
-  const s=+blk.dataset.s,en=+blk.dataset.e,cfg=careCfg(),days=weekDays(),n=weekSlots()[s],root=$("#sheetRoot");
-  root.innerHTML=`<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-label="간병"><h2>${esc(n)}</h2><p style="margin:0">${fmtDay(days[Math.floor(s/6)])} ${cfg.times[s%6]} ~ ${fmtDay(days[Math.floor((en+1)/6)]||days[6])} ${cfg.times[(en+1)%6]}</p>
+  const s=+blk.dataset.s,en=+blk.dataset.e,cfg=careCfg(),days=rangeDays(),n=rangeSlots()[s],root=$("#sheetRoot");
+  const endDay=days[Math.floor((en+1)/6)]||(()=>{const d=parseYmd(days[days.length-1]);d.setDate(d.getDate()+1);return ymd(d)})();
+  root.innerHTML=`<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-label="간병"><h2>${esc(n)}</h2><p style="margin:0">${fmtDay(days[Math.floor(s/6)])} ${cfg.times[s%6]} ~ ${fmtDay(endDay)} ${cfg.times[(en+1)%6]}</p>
     <div class="acts"><button class="btn danger" id="bDel">지우기</button><span class="spacer"></span><button class="btn" id="bClose">닫기</button></div></div></div>`;
   const close=()=>root.innerHTML="";$("#scrim").addEventListener("click",ev=>{if(ev.target.id==="scrim")close()});$("#bClose").onclick=close;
-  $("#bDel").onclick=()=>{if(!guard())return;const W=weekSlots();for(let i=s;i<=en;i++)W[i]=null;putWeek(W,true);close()};
+  $("#bDel").onclick=()=>{if(!guard())return;const W=rangeSlots();for(let i=s;i<=en;i++)W[i]=null;putRange(W,true);close()};
 });
-$("#cPrev").onclick=()=>{cWeek.setDate(cWeek.getDate()-7);renderCare()};
-$("#cNext").onclick=()=>{cWeek.setDate(cWeek.getDate()+7);renderCare()};
+$("#cPrev").onclick=()=>{const d=new Date(cView);d.setDate(d.getDate()-7);jumpTo(d,true)};
+$("#cNext").onclick=()=>{const d=new Date(cView);d.setDate(d.getDate()+7);jumpTo(d,true)};
 function saveCfg(patch){const c={...careCfg(),...patch};careLocal._cfg=c;S.care._cfg=c;renderCare();return save("care","_cfg",c).then(ok=>{if(ok&&careLocal._cfg===c)delete careLocal._cfg;return ok})}
 function openPeople(){
   if(!guard())return;const root=$("#sheetRoot");
